@@ -1,56 +1,27 @@
-# Xcode
-build/
-DerivedData/
-*.xcuserstate
-*.xcworkspace/xcuserdata/
-*.xcodeproj/xcuserdata/
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-xcuserdata/
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+
+# Env
+.env
+.env.local
 
 # macOS
 .DS_Store
-.AppleDouble
-.LSOverride
 ._*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-# Xcode
-build/
-DerivedData/
-*.xcodeproj/xcuserdata/
-*.xcworkspace/xcuserdata/
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-*.xccheckout
-*.moved-aside
-*.hmap
-*.ipa
-*.dSYM.zip
-*.dSYM
 
-# macOS
-.DS_Store
-._*
-
-# Swift Package Manager
-.build/
-Package.resolved
-
-# Misc
-*.swp
-*~
-xcuserdata/
+# Python
+__pycache__/
+*.pyc
+*.pyo

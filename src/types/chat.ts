@@ -1,0 +1,34 @@
+export type MessageRole = "system" | "user" | "assistant" | "tool";
+
+export interface ToolCall {
+  id: string;
+  function_name: string;
+  arguments: string;
+}
+
+export interface ChatMessage {
+  role: MessageRole;
+  content: string;
+  timestamp: string;
+  tool_calls?: ToolCall[];
+  tool_call_id?: string;
+}
+
+export interface LLMResponse {
+  content: string;
+  tool_calls: ToolCall[];
+}
+
+export type ChatState = "idle" | "waiting" | "streaming" | "toolCalling";
+
+export function userMessage(content: string): ChatMessage {
+  return { role: "user", content, timestamp: new Date().toISOString() };
+}
+
+export function assistantMessage(content: string, toolCalls?: ToolCall[]): ChatMessage {
+  return { role: "assistant", content, timestamp: new Date().toISOString(), tool_calls: toolCalls };
+}
+
+export function toolMessage(content: string, toolCallId: string): ChatMessage {
+  return { role: "tool", content, timestamp: new Date().toISOString(), tool_call_id: toolCallId };
+}

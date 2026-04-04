@@ -1,0 +1,44 @@
+[package]
+name = "luoxiaohei-pet"
+version = "1.0.0"
+description = "罗小黑桌宠 - 跨平台桌面宠物"
+authors = ["alertform"]
+edition = "2021"
+
+[lib]
+name = "luoxiaohei_pet_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "luoxiaohei-pet"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-store = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", features = ["json", "stream"] }
+futures-util = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+regex = "1"
+dirs = "5"
+tts = "0.26"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc = "0.2"
+
+[profile.dev]
+incremental = true
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+opt-level = "s"
+lto = true
+strip = true
