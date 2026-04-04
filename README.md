@@ -1,7 +1,7 @@
 # 罗小黑桌宠 🐱 — Tauri 跨平台版
 
 > 本分支为跨平台重写版本，使用 **Tauri 2 + Rust + React**。
-> macOS 原生版（Swift/AppKit）请切换至 [`main`](https://github.com/alertform/LuoXiaoHeiPet/tree/main) 分支。
+> macOS 原生版（Swift/AppKit）请切换至 [`swift`](https://github.com/alertform/LuoXiaoHeiPet/tree/swift) 分支。
 
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
@@ -90,9 +90,9 @@ npm run tauri build
 
 产物在 `src-tauri/target/release/bundle/`。
 
-## 与 main 分支的差异
+## 与 swift 分支的差异
 
-| | main（Swift） | tauri（本分支） |
+| | swift（Swift） | tauri（本分支） |
 |--|--|--|
 | 平台 | macOS only | macOS / Windows / Linux |
 | 前端 | AppKit / SwiftUI | React 18 + TypeScript |
