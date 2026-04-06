@@ -26,9 +26,17 @@ export function SettingsWindow() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const handleClose = async () => {
+    const { getCurrentWebviewWindow } = await import("@tauri-apps/api/webviewWindow");
+    getCurrentWebviewWindow().close();
+  };
+
   return (
     <div className={styles.window}>
-      <h2 className={styles.title}>罗小黑桌宠 - 设置</h2>
+      <div className={styles.titleBar} data-tauri-drag-region>
+        <span className={styles.titleText}>罗小黑桌宠 - 设置</span>
+        <button className={styles.titleCloseBtn} onClick={handleClose}>✕</button>
+      </div>
 
       <div className={styles.tabs}>
         {(["llm", "tts", "memory"] as const).map((t) => (

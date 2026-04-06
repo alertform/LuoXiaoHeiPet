@@ -10,11 +10,15 @@ export default function App() {
   const isSettings = window.location.hash === "#settings";
 
   useEffect(() => {
-    if (!isSettings) {
+    if (isSettings) return;
+    // 初始加载 + 定期轮询设置变更（设置窗口是独立窗口，无法直接通信）
+    const load = () =>
       loadSettings()
         .then((s) => setTtsEnabled(s.tts_enabled))
         .catch(console.error);
-    }
+    load();
+    const timer = setInterval(load, 3000);
+    return () => clearInterval(timer);
   }, [isSettings]);
 
   if (isSettings) {

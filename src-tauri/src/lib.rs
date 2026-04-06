@@ -68,7 +68,31 @@ pub fn run() {
             stop_speaking,
         ])
         .setup(|app| {
+            // 从 store 恢复已保存的配置
+            {
+                use tauri_plugin_store::StoreExt;
+                if let Ok(store) = app.handle().store("settings.json") {
+                    if let Some(val) = store.get("llm_config") {
+                        if let Ok(config) = serde_json::from_value::<LLMConfig>(val) {
+                            let state = app.state::<AppState>();
+                            *state.config.blocking_lock() = config;
+                        }
+                    }
+                    if let Some(val) = store.get("app_settings") {
+                        if let Ok(settings) = serde_json::from_value::<AppSettings>(val) {
+                            let state = app.state::<AppState>();
+                            *state.settings.blocking_lock() = settings;
+                        }
+                    }
+                }
+            }
+
             setup_tray(app.handle())?;
+            if let Some(window) = app.get_webview_window("pet") {
+                let _ = window.set_always_on_top(true);
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
             Ok(())
         })
         .run(tauri::generate_context!())
@@ -133,6 +157,7 @@ fn open_settings(app: &AppHandle) {
         .title("罗小黑桌宠 - 设置")
         .inner_size(500.0, 520.0)
         .resizable(false)
+        .decorations(false)
         .center()
         .build();
 }

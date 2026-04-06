@@ -4,43 +4,16 @@ import type { AnimationStateName } from "../types/animation";
 
 const frameCache = new Map<AnimationStateName, HTMLImageElement[]>();
 
-async function loadImage(src: string): Promise<HTMLImageElement | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = src;
-  });
+// 同步生成占位猫图，确保启动时立即可用
+let placeholderImg: HTMLImageElement | null = null;
+
+export function getPlaceholderSync(): HTMLImageElement {
+  return getPlaceholder();
 }
 
-export async function loadFrames(state: AnimationStateName): Promise<HTMLImageElement[]> {
-  if (frameCache.has(state)) {
-    return frameCache.get(state)!;
-  }
+function getPlaceholder(): HTMLImageElement {
+  if (placeholderImg) return placeholderImg;
 
-  const frames: HTMLImageElement[] = [];
-  const resDir = await resourceDir();
-
-  for (let i = 0; i < 100; i++) {
-    const fileName = `${state}_${String(i).padStart(3, "0")}.png`;
-    const filePath = await join(resDir, "animations", fileName);
-    const url = convertFileSrc(filePath);
-    const img = await loadImage(url);
-    if (!img) break;
-    frames.push(img);
-  }
-
-  if (frames.length === 0) {
-    // 加载占位帧（纯色方块）
-    const placeholder = await createPlaceholder();
-    frames.push(placeholder);
-  }
-
-  frameCache.set(state, frames);
-  return frames;
-}
-
-function createPlaceholder(): Promise<HTMLImageElement> {
   const canvas = document.createElement("canvas");
   canvas.width = 128;
   canvas.height = 128;
@@ -77,9 +50,46 @@ function createPlaceholder(): Promise<HTMLImageElement> {
   ctx.ellipse(73, 30, 6, 7, 0, 0, Math.PI * 2);
   ctx.fill();
 
+  const img = new Image();
+  img.src = canvas.toDataURL();
+  placeholderImg = img;
+  return img;
+}
+
+async function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img);
-    img.src = canvas.toDataURL();
+    img.onerror = () => resolve(null);
+    img.src = src;
   });
+}
+
+export async function loadFrames(state: AnimationStateName): Promise<HTMLImageElement[]> {
+  if (frameCache.has(state)) {
+    return frameCache.get(state)!;
+  }
+
+  const frames: HTMLImageElement[] = [];
+
+  try {
+    const resDir = await resourceDir();
+    for (let i = 0; i < 100; i++) {
+      const fileName = `${state}_${String(i).padStart(3, "0")}.png`;
+      const filePath = await join(resDir, "animations", fileName);
+      const url = convertFileSrc(filePath);
+      const img = await loadImage(url);
+      if (!img) break;
+      frames.push(img);
+    }
+  } catch {
+    // dev 模式下 resourceDir 可能不可用
+  }
+
+  if (frames.length === 0) {
+    frames.push(getPlaceholder());
+  }
+
+  frameCache.set(state, frames);
+  return frames;
 }

@@ -15,14 +15,14 @@
       {
         "label": "pet",
         "title": "罗小黑桌宠",
-        "width": 280,
-        "height": 160,
+        "width": 128,
+        "height": 128,
+        "center": true,
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
         "resizable": false,
         "skipTaskbar": true,
-        "shadow": false,
         "url": "index.html"
       }
     ],

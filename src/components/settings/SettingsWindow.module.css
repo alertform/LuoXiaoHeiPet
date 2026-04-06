@@ -1,7 +1,10 @@
 .window {
   padding: 20px 24px;
+  width: 100vw;
   min-height: 100vh;
   background: #f5f5f7;
+  border-radius: 12px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -9,10 +12,45 @@
   -webkit-user-select: text;
 }
 
-.title {
-  font-size: 16px;
-  font-weight: 700;
+.titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 0;
+  margin: -20px -24px 0;
+  padding: 12px 16px 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px 12px 0 0;
+  cursor: default;
+  -webkit-app-region: drag;
+}
+
+.titleText {
+  font-size: 14px;
+  font-weight: 600;
   color: #1d1d1f;
+}
+
+.titleCloseBtn {
+  -webkit-app-region: no-drag;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #999;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.titleCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #666;
 }
 
 .tabs {
@@ -139,7 +177,10 @@
 
 @media (prefers-color-scheme: dark) {
   .window { background: #1c1c1e; }
-  .title { color: #f5f5f7; }
+  .titleBar { background: rgba(255, 255, 255, 0.03); border-bottom-color: rgba(255, 255, 255, 0.08); }
+  .titleText { color: #f5f5f7; }
+  .titleCloseBtn { color: #666; }
+  .titleCloseBtn:hover { background: rgba(255, 255, 255, 0.1); color: #aaa; }
   .tabs { background: rgba(255, 255, 255, 0.05); }
   .activeTab { background: #2c2c2e; color: #f5f5f7; }
   .tab { color: #888; }

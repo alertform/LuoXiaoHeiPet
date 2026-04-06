@@ -39,6 +39,8 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
 
   const historyRef = useRef<ChatMessage[]>([]);
   const cancelledRef = useRef(false);
+  const ttsEnabledRef = useRef(ttsEnabled);
+  ttsEnabledRef.current = ttsEnabled;
 
   useEffect(() => {
     historyRef.current = history;
@@ -63,7 +65,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
       await sendToLLM(0);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendMessage, ttsEnabled]
+    [appendMessage]
   );
 
   const sendToLLM = useCallback(
@@ -104,7 +106,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
 
         await processConversation([...historyRef.current]).catch(() => {});
 
-        if (ttsEnabled && tokenBuffer) {
+        if (ttsEnabledRef.current && tokenBuffer) {
           speakText(tokenBuffer).catch(() => {});
         }
       });
@@ -117,7 +119,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendMessage, ttsEnabled]
+    [appendMessage]
   );
 
   const sendNonStreaming = useCallback(
@@ -142,7 +144,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
           setChatState("idle");
 
           await processConversation([...historyRef.current]).catch(() => {});
-          if (ttsEnabled) speakText(response.content).catch(() => {});
+          if (ttsEnabledRef.current) speakText(response.content).catch(() => {});
         } else {
           setChatState("idle");
         }
@@ -152,7 +154,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendMessage, ttsEnabled]
+    [appendMessage]
   );
 
   const handleToolCalls = useCallback(

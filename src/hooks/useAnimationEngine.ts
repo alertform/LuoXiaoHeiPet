@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadFrames } from "../services/animationLoader";
+import { loadFrames, getPlaceholderSync } from "../services/animationLoader";
 import { ANIMATION_CONFIGS, type AnimationEvent, type AnimationStateName } from "../types/animation";
 
 export interface AnimationEngine {
@@ -12,7 +12,7 @@ export interface AnimationEngine {
 
 export function useAnimationEngine(): AnimationEngine {
   const [currentState, setCurrentState] = useState<AnimationStateName>("idle");
-  const [currentFrame, setCurrentFrame] = useState<HTMLImageElement | null>(null);
+  const [currentFrame, setCurrentFrame] = useState<HTMLImageElement | null>(() => getPlaceholderSync());
 
   const framesRef = useRef<HTMLImageElement[]>([]);
   const frameIndexRef = useRef(0);
