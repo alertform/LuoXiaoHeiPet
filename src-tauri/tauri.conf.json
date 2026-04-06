@@ -10,6 +10,7 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "pet",
@@ -47,7 +48,5 @@
       "resources/animations/**/*": "animations/"
     }
   },
-  "plugins": {
-    "store": {}
-  }
+  "plugins": {}
 }

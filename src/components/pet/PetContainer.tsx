@@ -1,5 +1,5 @@
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
-import { PhysicalPosition, PhysicalSize } from "@tauri-apps/api/dpi";
+import { LogicalPosition, LogicalSize } from "@tauri-apps/api/dpi";
 import { useCallback, useEffect, useState } from "react";
 import { ChatBubble } from "../chat/ChatBubble";
 import { PetCanvas } from "./PetCanvas";
@@ -26,11 +26,15 @@ export function PetContainer({ ttsEnabled }: PetContainerProps) {
     setChatOpen(true);
     animation.handleEvent("startChat");
     const win = getCurrentWebviewWindow();
+    const factor = await win.scaleFactor();
     const pos = await win.outerPosition();
-    await win.setSize(new PhysicalSize(CHAT_WIDTH, CHAT_HEIGHT + PET_SIZE));
-    await win.setPosition(new PhysicalPosition(
-      pos.x + (PET_SIZE - CHAT_WIDTH) / 2,
-      pos.y - CHAT_HEIGHT,
+    // outerPosition returns physical pixels, convert to logical
+    const lx = pos.x / factor;
+    const ly = pos.y / factor;
+    await win.setSize(new LogicalSize(CHAT_WIDTH, CHAT_HEIGHT + PET_SIZE));
+    await win.setPosition(new LogicalPosition(
+      lx + (PET_SIZE - CHAT_WIDTH) / 2,
+      ly - CHAT_HEIGHT,
     ));
   }, [chatOpen, animation]);
 
@@ -39,11 +43,14 @@ export function PetContainer({ ttsEnabled }: PetContainerProps) {
     animation.handleEvent("endChat");
     chat.cancel();
     const win = getCurrentWebviewWindow();
+    const factor = await win.scaleFactor();
     const pos = await win.outerPosition();
-    await win.setSize(new PhysicalSize(PET_SIZE, PET_SIZE));
-    await win.setPosition(new PhysicalPosition(
-      pos.x + (CHAT_WIDTH - PET_SIZE) / 2,
-      pos.y + CHAT_HEIGHT,
+    const lx = pos.x / factor;
+    const ly = pos.y / factor;
+    await win.setSize(new LogicalSize(PET_SIZE, PET_SIZE));
+    await win.setPosition(new LogicalPosition(
+      lx + (CHAT_WIDTH - PET_SIZE) / 2,
+      ly + CHAT_HEIGHT,
     ));
   }, [animation, chat]);
 
