@@ -1,34 +1,38 @@
-# 罗小黑桌宠 🐱 — Tauri 跨平台版
+# LuoXiaoHei Desktop Pet 🐱 — Tauri Cross-Platform
 
-> 本分支为跨平台重写版本，使用 **Tauri 2 + Rust + React**。
-> macOS 原生版（Swift/AppKit）请切换至 [`AppKit`](https://github.com/alertform/LuoXiaoHeiPet/tree/AppKit) 分支。
+[中文](./README_CN.md) | English
+
+> Cross-platform rewrite using **Tauri 2 + Rust + React**.
+> For the macOS native version (Swift/AppKit), switch to the [`AppKit`](https://github.com/alertform/LuoXiaoHeiPet/tree/AppKit) branch.
 
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
 ![Rust](https://img.shields.io/badge/Rust-1.85%2B-orange)
 ![React](https://img.shields.io/badge/React-18-61dafb)
 
-## 功能
+## Features
 
-- 透明无边框悬浮窗，始终置顶，可自由拖拽
-- 帧动画播放（idle / sleep / walk / happy / stretch / lookAround / talking / thinking / drag / fall）
-- 双击呼出 AI 聊天气泡，流式输出
-- Function Calling：让小黑帮你操作文件（列目录、读写、搜索等）
-- 跨平台系统 TTS 语音朗读
-- 三层记忆系统（工作记忆 / 会话记忆 / 长期记忆）
-- 系统托盘菜单
+- Transparent borderless floating window, always on top, freely draggable
+- Frame animation (idle / sleep / walk / happy / stretch / lookAround / talking / thinking / drag / fall)
+- Double-click to open AI chat bubble with streaming output
+- Collapsible model reasoning/thinking process display
+- Function Calling: let Xiaohei operate files for you (list, read, write, search, etc.)
+- Cross-platform system TTS voice (toggle in settings)
+- Three-layer memory system (working / session / long-term)
+- System tray menu (show/hide, settings, quit)
+- Persistent configuration (API Key survives restarts)
 
-## 环境要求
+## Requirements
 
-| 工具 | 版本 |
-|------|------|
+| Tool | Version |
+|------|---------|
 | Node.js | 18+ |
 | Rust | 1.85+ |
 | Tauri CLI | 2.x |
 
-> Linux 透明窗口需要开启混成器（KDE Plasma / GNOME + compositor）
+> Linux transparent windows require a compositor (KDE Plasma / GNOME + compositor)
 
-## 快速开始
+## Quick Start
 
 ```bash
 git clone -b tauri https://github.com/alertform/LuoXiaoHeiPet.git
@@ -37,68 +41,70 @@ npm install
 npm run tauri dev
 ```
 
-首次启动后点击系统托盘图标 → **设置**，填入火山引擎 API Key。
+After first launch, click the system tray icon -> **Settings**, and enter your Volcano Engine API Key.
 
-> 申请地址：[火山引擎 MaaS 平台](https://www.volcengine.com/product/ark)  
-> 默认模型：`doubao-seed-2.0-pro`
+> Apply here: [Volcano Engine MaaS Platform](https://www.volcengine.com/product/ark)
+> Default model: `doubao-seed-2.0-pro`
 
-## 添加动画素材
+## Adding Animation Assets
 
-将 PNG 帧文件放入 `src-tauri/resources/animations/`，命名格式：
+Place PNG frame files in `src-tauri/resources/animations/`, naming format:
 
 ```
-{状态}_{序号3位}.png
-# 例：idle_000.png  walk_005.png  happy_003.png
+{state}_{3-digit-index}.png
+# e.g.: idle_000.png  walk_005.png  happy_003.png
 ```
 
-支持的状态：`idle` `sleep` `walk` `happy` `stretch` `lookAround` `talking` `thinking` `drag` `fall`
+Supported states: `idle` `sleep` `walk` `happy` `stretch` `lookAround` `talking` `thinking` `drag` `fall`
 
-无素材时自动显示内置占位小黑猫。
+A built-in placeholder cat is shown when no assets are available.
 
-## 项目结构
+## Project Structure
 
 ```
 ├── src-tauri/
 │   ├── src/
-│   │   ├── commands/       Tauri 命令（llm / file_tools / config / memory / tts）
-│   │   ├── services/       业务逻辑（VolcanoEngine SSE、文件工具、记忆、TTS）
-│   │   └── models/         数据模型（chat / config / memory）
-│   ├── resources/animations/   动画帧素材（PNG）
-│   ├── icons/              应用图标
+│   │   ├── commands/       Tauri commands (llm / file_tools / config / memory / tts)
+│   │   ├── services/       Business logic (VolcanoEngine SSE, file tools, memory, TTS)
+│   │   └── models/         Data models (chat / config / memory)
+│   ├── resources/animations/   Animation frame assets (PNG)
+│   ├── icons/              App icons
 │   └── tauri.conf.json
 ├── src/
 │   ├── components/
-│   │   ├── pet/            PetCanvas、PetContainer
-│   │   ├── chat/           ChatBubble、MessageList、ChatInput
-│   │   └── settings/       SettingsWindow（LLM / TTS / 记忆）
+│   │   ├── pet/            PetCanvas, PetContainer
+│   │   ├── chat/           ChatBubble, MessageList, ChatInput
+│   │   └── settings/       SettingsWindow (LLM / TTS / Memory)
 │   ├── hooks/
-│   │   ├── useAnimationEngine.ts   帧动画状态机
-│   │   ├── useChatManager.ts       聊天 + tool calling 循环
-│   │   └── useDrag.ts              Tauri 原生拖拽
+│   │   ├── useAnimationEngine.ts   Frame animation state machine
+│   │   ├── useChatManager.ts       Chat + tool calling + reasoning display
+│   │   └── useDrag.ts              Tauri native drag
 │   ├── services/
-│   │   ├── tauriCommands.ts        invoke 类型封装
-│   │   └── animationLoader.ts      帧图片预加载
+│   │   ├── tauriCommands.ts        Typed invoke wrappers
+│   │   └── animationLoader.ts      Frame preloading + placeholder generation
 │   └── types/              animation / chat / config
-└── tools/                  动画素材生成脚本（Python）
+└── tools/                  Animation asset generation scripts (Python)
 ```
 
-## 构建发布
+## Build for Release
 
 ```bash
 npm run tauri build
 ```
 
-产物在 `src-tauri/target/release/bundle/`。
+Output in `src-tauri/target/release/bundle/`.
 
-## 与 swift 分支的差异
+## Comparison with AppKit Branch
 
-| | AppKit（Swift） | tauri（本分支） |
+| | AppKit (Swift) | tauri (this branch) |
 |--|--|--|
-| 平台 | macOS only | macOS / Windows / Linux |
-| 前端 | AppKit / SwiftUI | React 18 + TypeScript |
-| 后端 | Swift | Rust |
-| 打包 | Xcode | Tauri CLI |
-| 体积 | ~5 MB | ~10 MB |
+| Platform | macOS only | macOS / Windows / Linux |
+| Frontend | AppKit / SwiftUI | React 18 + TypeScript |
+| Backend | Swift | Rust |
+| Packaging | Xcode | Tauri CLI |
+| Size | ~5 MB | ~10 MB |
+| Transparency | Native support | macOS requires Private API |
+| Reasoning | Not supported | Collapsible display |
 
 ## License
 
