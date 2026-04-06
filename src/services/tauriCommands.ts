@@ -13,6 +13,9 @@ export const sendMessageStream = (messages: ChatMessage[]) =>
 export const onLlmToken = (cb: (token: string) => void) =>
   listen<string>("llm-token", (e) => cb(e.payload));
 
+export const onLlmReasoning = (cb: (token: string) => void) =>
+  listen<string>("llm-reasoning", (e) => cb(e.payload));
+
 export const onLlmComplete = (cb: () => void) =>
   listen<void>("llm-complete", () => cb());
 

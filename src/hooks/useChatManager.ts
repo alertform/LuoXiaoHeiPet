@@ -3,6 +3,7 @@ import {
   buildMemoryContext,
   endSession,
   onLlmComplete,
+  onLlmReasoning,
   onLlmToken,
   processConversation,
   sendMessage,
@@ -24,6 +25,7 @@ const MAX_TOOL_ROUNDS = 5;
 export interface ChatManager {
   history: ChatMessage[];
   streamingContent: string;
+  reasoningContent: string;
   chatState: ChatState;
   toolStatus: string | null;
   send: (text: string) => void;
@@ -34,6 +36,7 @@ export interface ChatManager {
 export function useChatManager(ttsEnabled: boolean): ChatManager {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [streamingContent, setStreamingContent] = useState("");
+  const [reasoningContent, setReasoningContent] = useState("");
   const [chatState, setChatState] = useState<ChatState>("idle");
   const [toolStatus, setToolStatus] = useState<string | null>(null);
 
@@ -79,15 +82,24 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         : recent;
 
       let tokenBuffer = "";
+      setReasoningContent("");
+
+      const unlistenReasoning = await onLlmReasoning((token) => {
+        if (cancelledRef.current) return;
+        setChatState("streaming");
+        setReasoningContent((s) => s + token);
+      });
 
       const unlistenToken = await onLlmToken((token) => {
         if (cancelledRef.current) return;
         tokenBuffer += token;
         setChatState("streaming");
+        setReasoningContent("");
         setStreamingContent((s) => s + token);
       });
 
       const unlistenComplete = await onLlmComplete(async () => {
+        unlistenReasoning();
         unlistenToken();
         unlistenComplete();
 
@@ -112,6 +124,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
       });
 
       await sendMessageStream(messages).catch((err) => {
+        unlistenReasoning();
         unlistenToken();
         unlistenComplete();
         console.error("[LLM Stream]", err);
@@ -210,5 +223,5 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  return { history, streamingContent, chatState, toolStatus, send, cancel, clearHistory };
+  return { history, streamingContent, reasoningContent, chatState, toolStatus, send, cancel, clearHistory };
 }

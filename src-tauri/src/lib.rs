@@ -90,6 +90,19 @@ pub fn run() {
             setup_tray(app.handle())?;
             if let Some(window) = app.get_webview_window("pet") {
                 let _ = window.set_always_on_top(true);
+                #[cfg(target_os = "macos")]
+                {
+                    use cocoa::appkit::{NSColor, NSWindow};
+                    use cocoa::base::{id, NO};
+                    let _ = window.with_webview(move |webview| {
+                        #[allow(deprecated)]
+                        unsafe {
+                            let ns_window: id = webview.ns_window() as id;
+                            ns_window.setBackgroundColor_(NSColor::clearColor(std::ptr::null_mut()));
+                            ns_window.setOpaque_(NO);
+                        }
+                    });
+                }
                 let _ = window.show();
                 let _ = window.set_focus();
             }

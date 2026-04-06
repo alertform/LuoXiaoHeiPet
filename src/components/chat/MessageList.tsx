@@ -5,10 +5,11 @@ import styles from "./MessageList.module.css";
 interface MessageListProps {
   history: ChatMessage[];
   streamingContent: string;
+  reasoningContent: string;
   toolStatus: string | null;
 }
 
-export function MessageList({ history, streamingContent, toolStatus }: MessageListProps) {
+export function MessageList({ history, streamingContent, reasoningContent, toolStatus }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -33,6 +34,15 @@ export function MessageList({ history, streamingContent, toolStatus }: MessageLi
           <div className={styles.bubble}>{msg.content}</div>
         </div>
       ))}
+
+      {reasoningContent && (
+        <div className={`${styles.message} ${styles.system}`}>
+          <div className={styles.reasoning}>
+            <span className={styles.reasoningLabel}>思考中...</span>
+            {reasoningContent}
+          </div>
+        </div>
+      )}
 
       {streamingContent && (
         <div className={`${styles.message} ${styles.assistant}`}>

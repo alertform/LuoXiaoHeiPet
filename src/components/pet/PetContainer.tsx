@@ -81,6 +81,7 @@ export function PetContainer({ ttsEnabled }: PetContainerProps) {
         <ChatBubble
           history={chat.history}
           streamingContent={chat.streamingContent}
+          reasoningContent={chat.reasoningContent}
           chatState={chat.chatState}
           toolStatus={chat.toolStatus}
           onSend={chat.send}

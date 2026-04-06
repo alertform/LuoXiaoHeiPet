@@ -7,6 +7,7 @@ import styles from "./ChatBubble.module.css";
 interface ChatBubbleProps {
   history: ChatMessage[];
   streamingContent: string;
+  reasoningContent: string;
   chatState: ChatState;
   toolStatus: string | null;
   onSend: (text: string) => void;
@@ -17,6 +18,7 @@ interface ChatBubbleProps {
 export function ChatBubble({
   history,
   streamingContent,
+  reasoningContent,
   chatState,
   toolStatus,
   onSend,
@@ -44,6 +46,7 @@ export function ChatBubble({
       <MessageList
         history={history}
         streamingContent={streamingContent}
+        reasoningContent={reasoningContent}
         toolStatus={toolStatus}
       />
 

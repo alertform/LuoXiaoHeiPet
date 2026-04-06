@@ -108,7 +108,15 @@ impl VolcanoEngineService {
                     return Ok(());
                 }
                 if let Ok(chunk_val) = serde_json::from_str::<Value>(json_str) {
-                    if let Some(token) = chunk_val["choices"][0]["delta"]["content"].as_str() {
+                    let delta = &chunk_val["choices"][0]["delta"];
+                    // 思考过程
+                    if let Some(reasoning) = delta["reasoning_content"].as_str() {
+                        if !reasoning.is_empty() {
+                            let _ = app.emit("llm-reasoning", reasoning);
+                        }
+                    }
+                    // 正式回复
+                    if let Some(token) = delta["content"].as_str() {
                         if !token.is_empty() {
                             let _ = app.emit("llm-token", token);
                         }

@@ -73,6 +73,28 @@
   50% { opacity: 0; }
 }
 
+.reasoning {
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  padding: 6px 10px;
+  max-width: 220px;
+  max-height: 80px;
+  overflow-y: auto;
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.reasoningLabel {
+  font-weight: 600;
+  color: #aaa;
+  display: block;
+  margin-bottom: 2px;
+}
+
 .toolStatus {
   font-size: 11px;
   color: #888;
