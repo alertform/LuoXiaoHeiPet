@@ -12,6 +12,7 @@ export interface ChatMessage {
   timestamp: string;
   tool_calls?: ToolCall[];
   tool_call_id?: string;
+  reasoning?: string;
 }
 
 export interface LLMResponse {
@@ -25,8 +26,8 @@ export function userMessage(content: string): ChatMessage {
   return { role: "user", content, timestamp: new Date().toISOString() };
 }
 
-export function assistantMessage(content: string, toolCalls?: ToolCall[]): ChatMessage {
-  return { role: "assistant", content, timestamp: new Date().toISOString(), tool_calls: toolCalls };
+export function assistantMessage(content: string, toolCalls?: ToolCall[], reasoning?: string): ChatMessage {
+  return { role: "assistant", content, timestamp: new Date().toISOString(), tool_calls: toolCalls, reasoning };
 }
 
 export function toolMessage(content: string, toolCallId: string): ChatMessage {

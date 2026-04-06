@@ -82,10 +82,12 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         : recent;
 
       let tokenBuffer = "";
+      let reasoningBuffer = "";
       setReasoningContent("");
 
       const unlistenReasoning = await onLlmReasoning((token) => {
         if (cancelledRef.current) return;
+        reasoningBuffer += token;
         setChatState("streaming");
         setReasoningContent((s) => s + token);
       });
@@ -94,7 +96,6 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         if (cancelledRef.current) return;
         tokenBuffer += token;
         setChatState("streaming");
-        setReasoningContent("");
         setStreamingContent((s) => s + token);
       });
 
@@ -106,14 +107,14 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         if (cancelledRef.current) return;
 
         if (!tokenBuffer) {
-          // 流式为空 → 可能有 tool calls，切换非流式
           await sendNonStreaming(messages, toolRound);
           return;
         }
 
-        const assistMsg = assistantMessage(tokenBuffer);
+        const assistMsg = assistantMessage(tokenBuffer, undefined, reasoningBuffer || undefined);
         appendMessage(assistMsg);
         setStreamingContent("");
+        setReasoningContent("");
         setChatState("idle");
 
         await processConversation([...historyRef.current]).catch(() => {});

@@ -73,7 +73,52 @@
   50% { opacity: 0; }
 }
 
-.reasoning {
+.reasoningBlock {
+  max-width: 220px;
+}
+
+.reasoningToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  color: #999;
+  padding: 2px 0;
+}
+
+.reasoningToggle:hover {
+  color: #666;
+}
+
+.arrow {
+  font-size: 8px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.arrowOpen {
+  transform: rotate(90deg);
+}
+
+.reasoningBody {
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-top: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.4;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.reasoningStreaming {
   font-size: 11px;
   color: #999;
   font-style: italic;
@@ -117,5 +162,19 @@
   .toolStatus {
     background: rgba(255, 255, 255, 0.05);
     color: #888;
+  }
+
+  .reasoningBody,
+  .reasoningStreaming {
+    background: rgba(255, 255, 255, 0.03);
+    color: #777;
+  }
+
+  .reasoningToggle {
+    color: #777;
+  }
+
+  .reasoningToggle:hover {
+    color: #aaa;
   }
 }

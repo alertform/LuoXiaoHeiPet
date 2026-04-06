@@ -1,6 +1,25 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChatMessage } from "../../types/chat";
 import styles from "./MessageList.module.css";
+
+function ReasoningBlock({ content }: { content: string }) {
+  const [collapsed, setCollapsed] = useState(true);
+
+  return (
+    <div className={styles.reasoningBlock}>
+      <button
+        className={styles.reasoningToggle}
+        onClick={() => setCollapsed((c) => !c)}
+      >
+        <span className={`${styles.arrow} ${collapsed ? "" : styles.arrowOpen}`}>▶</span>
+        思考过程
+      </button>
+      {!collapsed && (
+        <div className={styles.reasoningBody}>{content}</div>
+      )}
+    </div>
+  );
+}
 
 interface MessageListProps {
   history: ChatMessage[];
@@ -14,7 +33,7 @@ export function MessageList({ history, streamingContent, reasoningContent, toolS
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [history, streamingContent, toolStatus]);
+  }, [history, streamingContent, reasoningContent, toolStatus]);
 
   const displayMessages = history.filter(
     (m) => m.role === "user" || m.role === "assistant"
@@ -22,22 +41,28 @@ export function MessageList({ history, streamingContent, reasoningContent, toolS
 
   return (
     <div className={styles.list}>
-      {displayMessages.length === 0 && (
+      {displayMessages.length === 0 && !reasoningContent && !streamingContent && (
         <p className={styles.empty}>双击呼出小黑，开始聊天喵~</p>
       )}
 
       {displayMessages.map((msg, i) => (
-        <div
-          key={i}
-          className={`${styles.message} ${msg.role === "user" ? styles.user : styles.assistant}`}
-        >
-          <div className={styles.bubble}>{msg.content}</div>
+        <div key={i}>
+          {msg.role === "assistant" && msg.reasoning && (
+            <div className={`${styles.message} ${styles.assistant}`}>
+              <ReasoningBlock content={msg.reasoning} />
+            </div>
+          )}
+          <div
+            className={`${styles.message} ${msg.role === "user" ? styles.user : styles.assistant}`}
+          >
+            <div className={styles.bubble}>{msg.content}</div>
+          </div>
         </div>
       ))}
 
       {reasoningContent && (
-        <div className={`${styles.message} ${styles.system}`}>
-          <div className={styles.reasoning}>
+        <div className={`${styles.message} ${styles.assistant}`}>
+          <div className={styles.reasoningStreaming}>
             <span className={styles.reasoningLabel}>思考中...</span>
             {reasoningContent}
           </div>
