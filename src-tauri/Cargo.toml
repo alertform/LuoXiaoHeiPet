@@ -1,6 +1,6 @@
 [package]
 name = "luoxiaohei-pet"
-version = "0.0.1"
+version = "0.0.2"
 description = "罗小黑桌宠 - 跨平台桌面宠物"
 authors = ["alertform"]
 edition = "2021"
