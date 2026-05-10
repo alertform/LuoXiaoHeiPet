@@ -20,6 +20,7 @@ export function useAnimationEngine(): AnimationEngine {
   const nextStateRef = useRef<AnimationStateName | null>(null);
   const currentStateRef = useRef<AnimationStateName>("idle");
   const autoBehaviorRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const playRequestRef = useRef(0);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -54,14 +55,22 @@ export function useAnimationEngine(): AnimationEngine {
       // 循环状态不重复播放
       if (currentStateRef.current === state && config.isLooping) return;
 
+      const requestId = playRequestRef.current + 1;
+      playRequestRef.current = requestId;
       currentStateRef.current = state;
       setCurrentState(state);
       frameIndexRef.current = 0;
       nextStateRef.current = thenState ?? config.defaultTransition;
 
       stopTimer();
+      if (state !== "idle") {
+        stopAutoBehavior();
+      }
 
       const frames = await loadFrames(state);
+      if (playRequestRef.current !== requestId || currentStateRef.current !== state) {
+        return;
+      }
       framesRef.current = frames;
 
       if (frames.length === 0) return;
@@ -86,8 +95,6 @@ export function useAnimationEngine(): AnimationEngine {
 
       if (state === "idle") {
         startAutoBehavior();
-      } else {
-        stopAutoBehavior();
       }
     },
     [startAutoBehavior, stopAutoBehavior, stopTimer]
