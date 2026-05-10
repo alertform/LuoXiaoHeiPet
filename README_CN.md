@@ -1,9 +1,8 @@
-# 罗小黑桌宠 - Tauri 跨平台版
+# 罗小黑桌宠
 
 中文 | [English](./README.md)
 
-> 本分支为跨平台重写版本，使用 **Tauri 2 + Rust + React**。
-> macOS 原生版（Swift/AppKit）请切换至 [`AppKit`](https://github.com/alertform/LuoXiaoHeiPet/tree/AppKit) 分支。
+> 跨平台桌面宠物，基于 **Tauri 2 + Rust + React** — AI 流式对话、Tool Calling、多供应商路由、TTS、10+ 手绘动画状态。
 
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
@@ -42,7 +41,7 @@
 ## 快速开始
 
 ```bash
-git clone -b tauri https://github.com/alertform/LuoXiaoHeiPet.git
+git clone https://github.com/alertform/LuoXiaoHeiPet.git
 cd LuoXiaoHeiPet
 npm install
 npm run tauri dev
@@ -150,18 +149,6 @@ npm run tauri build
 ```
 
 产物在 `src-tauri/target/release/bundle/`。
-
-## 与 AppKit 分支的差异
-
-| | AppKit（Swift） | tauri（本分支） |
-|--|--|--|
-| 平台 | macOS only | macOS / Windows / Linux |
-| 前端 | AppKit / SwiftUI | React 18 + TypeScript |
-| 后端 | Swift | Rust |
-| 打包 | Xcode | Tauri CLI |
-| 体积 | ~5 MB | ~10 MB |
-| 窗口透明 | 原生支持 | macOS 需 Private API |
-| 思考过程 | 不支持 | 可折叠显示 |
 
 ## License
 

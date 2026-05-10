@@ -1,9 +1,8 @@
-# LuoXiaoHei Desktop Pet - Tauri Cross-Platform
+# LuoXiaoHei Desktop Pet
 
 [中文](./README_CN.md) | English
 
-> Cross-platform rewrite using **Tauri 2 + Rust + React**.
-> For the macOS native version (Swift/AppKit), switch to the [`AppKit`](https://github.com/alertform/LuoXiaoHeiPet/tree/AppKit) branch.
+> Cross-platform desktop pet built with **Tauri 2 + Rust + React** — streaming AI chat, tool calling, multi-provider routing, TTS, and 10+ hand-drawn animation states.
 
 ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 ![Tauri](https://img.shields.io/badge/Tauri-2.x-blue)
@@ -42,7 +41,7 @@
 ## Quick Start
 
 ```bash
-git clone -b tauri https://github.com/alertform/LuoXiaoHeiPet.git
+git clone https://github.com/alertform/LuoXiaoHeiPet.git
 cd LuoXiaoHeiPet
 npm install
 npm run tauri dev
@@ -153,18 +152,6 @@ npm run tauri build
 ```
 
 Output in `src-tauri/target/release/bundle/`.
-
-## Comparison with AppKit Branch
-
-| | AppKit (Swift) | tauri (this branch) |
-|--|--|--|
-| Platform | macOS only | macOS / Windows / Linux |
-| Frontend | AppKit / SwiftUI | React 18 + TypeScript |
-| Backend | Swift | Rust |
-| Packaging | Xcode | Tauri CLI |
-| Size | ~5 MB | ~10 MB |
-| Transparency | Native support | macOS requires Private API |
-| Reasoning | Not supported | Collapsible display |
 
 ## License
 
