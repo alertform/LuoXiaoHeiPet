@@ -18,6 +18,23 @@ export interface ChatMessage {
 export interface LLMResponse {
   content: string;
   tool_calls: ToolCall[];
+  usage?: TokenUsage;
+}
+
+export interface TokenUsage {
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+}
+
+export interface TokenUsageStats {
+  provider: string;
+  model: string;
+  requests: number;
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+  last_used_at: string;
 }
 
 export type ChatState = "idle" | "waiting" | "streaming" | "toolCalling";

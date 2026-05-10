@@ -10,7 +10,10 @@ interface ChatBubbleProps {
   reasoningContent: string;
   chatState: ChatState;
   toolStatus: string | null;
+  queuedMessages: ChatMessage[];
   onSend: (text: string) => void;
+  onUpdateQueuedMessage: (index: number, text: string) => void;
+  onRemoveQueuedMessage: (index: number) => void;
   onCancel: () => void;
   onClose: () => void;
 }
@@ -21,7 +24,10 @@ export function ChatBubble({
   reasoningContent,
   chatState,
   toolStatus,
+  queuedMessages,
   onSend,
+  onUpdateQueuedMessage,
+  onRemoveQueuedMessage,
   onCancel,
   onClose,
 }: ChatBubbleProps) {
@@ -37,7 +43,10 @@ export function ChatBubble({
   };
 
   return (
-    <div className={`${styles.bubble} ${visible ? styles.visible : ""}`}>
+    <div
+      className={`${styles.bubble} ${visible ? styles.visible : ""}`}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div className={styles.header}>
         <span className={styles.title}>罗小黑</span>
         <button className={styles.closeBtn} onClick={handleClose}>✕</button>
@@ -48,11 +57,15 @@ export function ChatBubble({
         streamingContent={streamingContent}
         reasoningContent={reasoningContent}
         toolStatus={toolStatus}
+        queuedMessages={queuedMessages}
       />
 
       <ChatInput
         chatState={chatState}
+        queuedMessages={queuedMessages}
         onSend={onSend}
+        onUpdateQueuedMessage={onUpdateQueuedMessage}
+        onRemoveQueuedMessage={onRemoveQueuedMessage}
         onCancel={onCancel}
       />
 

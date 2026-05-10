@@ -26,7 +26,7 @@
 - 跨平台系统 TTS 语音朗读（可在设置中开关）
 - 三层记忆系统（工作记忆 / 会话记忆 / 长期记忆）
 - 系统托盘菜单（显示/隐藏、设置、退出）
-- 通过 OpenRouter 统一接入模型，内置 Claude、DeepSeek、MiniMax、Qwen、OpenAI 快捷选项
+- 支持直连 Claude、DeepSeek、MiniMax、Qwen，并保留 OpenRouter 中转方式
 - 配置持久化（API Key、模型、语音、记忆设置等重启后保留）
 
 ## 环境要求
@@ -48,36 +48,29 @@ npm install
 npm run tauri dev
 ```
 
-首次启动后点击系统托盘图标 -> **设置**，配置 OpenRouter。
+首次启动后点击系统托盘图标 -> **设置**，配置模型供应商。
 
-OpenRouter API Key 有两种配置方式：
+API Key 有两种配置方式：
 
 - 在 **设置 -> 模型** 中填写
-- 或在启动应用前设置环境变量 `OPENROUTER_API_KEY`
+- 或在启动应用前设置对应供应商的环境变量
 
 ```bash
-export OPENROUTER_API_KEY="sk-or-v1-..."
+export DEEPSEEK_API_KEY="sk-..."
 npm run tauri dev
 ```
 
-Endpoint 已固定在程序内部：
+支持的供应商：
 
-```text
-https://openrouter.ai/api/v1/chat/completions
-```
+| 供应商 | Endpoint | 环境变量 |
+|--------|----------|----------|
+| Claude / Anthropic | `https://api.anthropic.com/v1/messages` | `ANTHROPIC_API_KEY` |
+| DeepSeek | `https://api.deepseek.com/chat/completions` | `DEEPSEEK_API_KEY` |
+| MiniMax | `https://api.minimax.io/v1/chat/completions` | `MINIMAX_API_KEY` |
+| Qwen / DashScope | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `DASHSCOPE_API_KEY` |
+| OpenRouter | `https://openrouter.ai/api/v1/chat/completions` | `OPENROUTER_API_KEY` |
 
-设置面板内置常用模型快捷选项：
-
-- Claude Sonnet: `anthropic/claude-sonnet-4.5`
-- Claude Haiku: `anthropic/claude-haiku-4.5`
-- DeepSeek V4: `deepseek/deepseek-v4-pro`
-- DeepSeek Chat: `deepseek/deepseek-chat-v3.1`
-- MiniMax M2.7: `minimax/minimax-m2.7`
-- Qwen Plus: `qwen/qwen3.6-plus`
-- Qwen Coder: `qwen/qwen3-coder-plus`
-- OpenAI GPT-5.2: `openai/gpt-5.2`
-
-也可以直接手动填写任意 OpenRouter model id。
+设置面板内置各供应商常用模型快捷选项，也可以手动填写当前供应商支持的模型 id。
 
 ## 使用方式
 
@@ -87,6 +80,16 @@ https://openrouter.ai/api/v1/chat/completions
 - 在 **设置 -> 模型** 中修改 API Key、模型、温度、最大 Token 和系统提示词
 - 在 **设置 -> 语音** 中开关语音朗读
 - 在 **设置 -> 记忆** 中开关或清空长期记忆
+
+### 可选 Edge TTS
+
+语音设置支持可选的 Edge 在线 TTS，引擎声音比系统 TTS 更自然。使用前先安装：
+
+```bash
+python3 -m pip install edge-tts
+```
+
+如果 Edge TTS 不可用，应用会回退到系统 TTS。
 
 ## 动画素材
 
@@ -119,7 +122,7 @@ python3 -m venv /tmp/luoxiaohei-assets-venv
 ├── src-tauri/
 │   ├── src/
 │   │   ├── commands/       Tauri 命令（llm / file_tools / config / memory / tts）
-│   │   ├── services/       业务逻辑（OpenRouter SSE、文件工具、记忆、TTS）
+│   │   ├── services/       业务逻辑（多供应商 SSE、文件工具、记忆、TTS）
 │   │   └── models/         数据模型（chat / config / memory）
 │   ├── resources/animations/   动画帧素材（PNG）
 │   ├── icons/              应用图标

@@ -57,6 +57,8 @@ pub fn run() {
             save_config,
             load_settings,
             save_settings,
+            load_token_usage_stats,
+            clear_token_usage_stats,
             // memory
             build_memory_context,
             process_conversation,
@@ -76,13 +78,15 @@ pub fn run() {
                     if let Some(val) = store.get("llm_config") {
                         if let Ok(config) = serde_json::from_value::<LLMConfig>(val) {
                             let mut config = config;
-                            config.normalize_openrouter();
+                            config.normalize_provider();
                             let state = app.state::<AppState>();
                             *state.config.blocking_lock() = config;
                         }
                     }
                     if let Some(val) = store.get("app_settings") {
                         if let Ok(settings) = serde_json::from_value::<AppSettings>(val) {
+                            let mut settings = settings;
+                            settings.normalize();
                             let state = app.state::<AppState>();
                             *state.settings.blocking_lock() = settings;
                         }

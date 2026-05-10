@@ -1,4 +1,5 @@
 use crate::{
+    commands::config::record_token_usage,
     models::{chat::ChatMessage, config::LLMConfig},
     services::volcano_engine::VolcanoEngineService,
     AppState,
@@ -8,11 +9,16 @@ use tauri::{AppHandle, State};
 #[tauri::command]
 pub async fn send_message(
     messages: Vec<ChatMessage>,
+    app: AppHandle,
     state: State<'_, AppState>,
 ) -> Result<crate::models::chat::LLMResponse, String> {
     let config = state.config.lock().await.clone();
-    let svc = VolcanoEngineService::new(config);
-    svc.send_message(&messages, true).await
+    let svc = VolcanoEngineService::new(config.clone());
+    let response = svc.send_message(&messages, true).await?;
+    if let Some(usage) = &response.usage {
+        record_token_usage(&app, &config, usage)?;
+    }
+    Ok(response)
 }
 
 #[tauri::command]
@@ -22,8 +28,12 @@ pub async fn send_message_stream(
     state: State<'_, AppState>,
 ) -> Result<(), String> {
     let config = state.config.lock().await.clone();
-    let svc = VolcanoEngineService::new(config);
-    svc.send_message_stream(&messages, true, &app).await
+    let svc = VolcanoEngineService::new(config.clone());
+    let usage = svc.send_message_stream(&messages, true, &app).await?;
+    if let Some(usage) = &usage {
+        record_token_usage(&app, &config, usage)?;
+    }
+    Ok(())
 }
 
 #[tauri::command]

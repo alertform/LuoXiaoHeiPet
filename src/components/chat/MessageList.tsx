@@ -26,14 +26,21 @@ interface MessageListProps {
   streamingContent: string;
   reasoningContent: string;
   toolStatus: string | null;
+  queuedMessages: ChatMessage[];
 }
 
-export function MessageList({ history, streamingContent, reasoningContent, toolStatus }: MessageListProps) {
+export function MessageList({
+  history,
+  streamingContent,
+  reasoningContent,
+  toolStatus,
+  queuedMessages,
+}: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [history, streamingContent, reasoningContent, toolStatus]);
+  }, [history, streamingContent, reasoningContent, toolStatus, queuedMessages]);
 
   const displayMessages = history.filter(
     (m) => m.role === "user" || m.role === "assistant"
@@ -41,7 +48,7 @@ export function MessageList({ history, streamingContent, reasoningContent, toolS
 
   return (
     <div className={styles.list}>
-      {displayMessages.length === 0 && !reasoningContent && !streamingContent && (
+      {displayMessages.length === 0 && !reasoningContent && !streamingContent && queuedMessages.length === 0 && (
         <p className={styles.empty}>双击呼出小黑，开始聊天喵~</p>
       )}
 
@@ -83,6 +90,12 @@ export function MessageList({ history, streamingContent, reasoningContent, toolS
           <div className={styles.toolStatus}>⚙️ {toolStatus}</div>
         </div>
       )}
+
+      {queuedMessages.map((msg, i) => (
+        <div key={`${msg.timestamp}-${i}`} className={`${styles.message} ${styles.user} ${styles.queued}`}>
+          <div className={styles.bubble}>{msg.content}</div>
+        </div>
+      ))}
 
       <div ref={bottomRef} />
     </div>

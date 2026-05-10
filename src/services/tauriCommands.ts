@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { ChatMessage, LLMResponse } from "../types/chat";
+import type { ChatMessage, LLMResponse, TokenUsageStats } from "../types/chat";
 import type { AppSettings, LLMConfig } from "../types/config";
 
 // LLM
@@ -29,6 +29,10 @@ export const saveConfig = (config: LLMConfig) => invoke<void>("save_config", { c
 export const loadSettings = () => invoke<AppSettings>("load_settings");
 export const saveSettings = (settings: AppSettings) =>
   invoke<void>("save_settings", { settings });
+export const loadTokenUsageStats = () =>
+  invoke<TokenUsageStats[]>("load_token_usage_stats");
+export const clearTokenUsageStats = () =>
+  invoke<void>("clear_token_usage_stats");
 
 // Memory
 export const buildMemoryContext = () => invoke<string>("build_memory_context");

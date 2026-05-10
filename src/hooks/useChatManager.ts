@@ -28,7 +28,10 @@ export interface ChatManager {
   reasoningContent: string;
   chatState: ChatState;
   toolStatus: string | null;
+  queuedMessages: ChatMessage[];
   send: (text: string) => void;
+  updateQueuedMessage: (index: number, text: string) => void;
+  removeQueuedMessage: (index: number) => void;
   cancel: () => void;
   clearHistory: () => void;
 }
@@ -39,9 +42,13 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
   const [reasoningContent, setReasoningContent] = useState("");
   const [chatState, setChatState] = useState<ChatState>("idle");
   const [toolStatus, setToolStatus] = useState<string | null>(null);
+  const [queuedMessages, setQueuedMessages] = useState<ChatMessage[]>([]);
 
   const historyRef = useRef<ChatMessage[]>([]);
   const cancelledRef = useRef(false);
+  const processingRef = useRef(false);
+  const queuedMessagesRef = useRef<ChatMessage[]>([]);
+  const processNextQueuedRef = useRef<() => void>(() => {});
   const ttsEnabledRef = useRef(ttsEnabled);
   ttsEnabledRef.current = ttsEnabled;
 
@@ -57,18 +64,39 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
     });
   }, []);
 
-  const send = useCallback(
-    async (text: string) => {
-      cancelledRef.current = false;
-      const userMsg = userMessage(text);
-      appendMessage(userMsg);
-      setChatState("waiting");
-      setStreamingContent("");
+  const syncQueuedMessages = useCallback(() => {
+    setQueuedMessages([...queuedMessagesRef.current]);
+  }, []);
 
-      await sendToLLM(0);
+  const showError = useCallback(
+    (err: unknown) => {
+      const message = err instanceof Error ? err.message : String(err);
+      appendMessage(assistantMessage(`请求失败：${message}`));
+      setStreamingContent("");
+      setReasoningContent("");
+      setToolStatus(null);
+      processNextQueuedRef.current();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [appendMessage]
+  );
+
+  const completeCurrentTurn = useCallback(
+    async (assistantText?: string, shouldProcessMemory = true) => {
+      setStreamingContent("");
+      setReasoningContent("");
+      setToolStatus(null);
+
+      if (shouldProcessMemory) {
+        await processConversation([...historyRef.current]).catch(() => {});
+      }
+
+      if (ttsEnabledRef.current && assistantText) {
+        speakText(assistantText).catch(() => {});
+      }
+
+      processNextQueuedRef.current();
+    },
+    []
   );
 
   const sendToLLM = useCallback(
@@ -113,15 +141,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
 
         const assistMsg = assistantMessage(tokenBuffer, undefined, reasoningBuffer || undefined);
         appendMessage(assistMsg);
-        setStreamingContent("");
-        setReasoningContent("");
-        setChatState("idle");
-
-        await processConversation([...historyRef.current]).catch(() => {});
-
-        if (ttsEnabledRef.current && tokenBuffer) {
-          speakText(tokenBuffer).catch(() => {});
-        }
+        await completeCurrentTurn(tokenBuffer);
       });
 
       await sendMessageStream(messages).catch((err) => {
@@ -129,18 +149,18 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         unlistenToken();
         unlistenComplete();
         console.error("[LLM Stream]", err);
-        setChatState("idle");
+        showError(err);
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendMessage]
+    [appendMessage, completeCurrentTurn, showError]
   );
 
   const sendNonStreaming = useCallback(
     async (messages: ChatMessage[], toolRound: number) => {
       if (toolRound >= MAX_TOOL_ROUNDS) {
         appendMessage(assistantMessage("工具调用次数过多，已停止喵~"));
-        setChatState("idle");
+        await completeCurrentTurn(undefined, false);
         return;
       }
 
@@ -153,22 +173,17 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
         } else if (response.content) {
           const assistMsg = assistantMessage(response.content);
           appendMessage(assistMsg);
-          setStreamingContent(response.content);
-          setTimeout(() => setStreamingContent(""), 100);
-          setChatState("idle");
-
-          await processConversation([...historyRef.current]).catch(() => {});
-          if (ttsEnabledRef.current) speakText(response.content).catch(() => {});
+          await completeCurrentTurn(response.content);
         } else {
-          setChatState("idle");
+          appendMessage(assistantMessage("模型返回了空内容，请检查模型是否支持当前参数或工具调用。"));
+          await completeCurrentTurn(undefined, false);
         }
       } catch (err) {
-        appendMessage(assistantMessage(`出错了：${err}`));
-        setChatState("idle");
+        showError(err);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendMessage]
+    [appendMessage, completeCurrentTurn, showError]
   );
 
   const handleToolCalls = useCallback(
@@ -203,17 +218,100 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
     [appendMessage]
   );
 
+  const startMessage = useCallback(
+    (msg: ChatMessage) => {
+      processingRef.current = true;
+      cancelledRef.current = false;
+      appendMessage(msg);
+      setChatState("waiting");
+      setStreamingContent("");
+      setReasoningContent("");
+      setToolStatus(null);
+      void sendToLLM(0);
+    },
+    [appendMessage, sendToLLM]
+  );
+
+  const processNextQueued = useCallback(() => {
+    if (cancelledRef.current) return;
+
+    const next = queuedMessagesRef.current.shift();
+    syncQueuedMessages();
+
+    if (!next) {
+      processingRef.current = false;
+      setChatState("idle");
+      return;
+    }
+
+    startMessage(next);
+  }, [startMessage, syncQueuedMessages]);
+
+  processNextQueuedRef.current = processNextQueued;
+
+  const send = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+
+      const userMsg = userMessage(trimmed);
+      if (processingRef.current) {
+        queuedMessagesRef.current.push(userMsg);
+        syncQueuedMessages();
+        return;
+      }
+
+      startMessage(userMsg);
+    },
+    [startMessage, syncQueuedMessages]
+  );
+
+  const updateQueuedMessage = useCallback(
+    (index: number, text: string) => {
+      const trimmed = text.trim();
+      if (index < 0 || index >= queuedMessagesRef.current.length) return;
+
+      if (!trimmed) {
+        queuedMessagesRef.current.splice(index, 1);
+      } else {
+        queuedMessagesRef.current[index] = {
+          ...queuedMessagesRef.current[index],
+          content: trimmed,
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      syncQueuedMessages();
+    },
+    [syncQueuedMessages]
+  );
+
+  const removeQueuedMessage = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= queuedMessagesRef.current.length) return;
+      queuedMessagesRef.current.splice(index, 1);
+      syncQueuedMessages();
+    },
+    [syncQueuedMessages]
+  );
+
   const cancel = useCallback(() => {
     cancelledRef.current = true;
+    processingRef.current = false;
+    queuedMessagesRef.current = [];
+    syncQueuedMessages();
     setChatState("idle");
     setStreamingContent("");
+    setReasoningContent("");
     setToolStatus(null);
-  }, []);
+  }, [syncQueuedMessages]);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
     historyRef.current = [];
-  }, []);
+    queuedMessagesRef.current = [];
+    syncQueuedMessages();
+  }, [syncQueuedMessages]);
 
   // app 关闭时保存会话记忆
   useEffect(() => {
@@ -224,5 +322,17 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  return { history, streamingContent, reasoningContent, chatState, toolStatus, send, cancel, clearHistory };
+  return {
+    history,
+    streamingContent,
+    reasoningContent,
+    chatState,
+    toolStatus,
+    queuedMessages,
+    send,
+    updateQueuedMessage,
+    removeQueuedMessage,
+    cancel,
+    clearHistory,
+  };
 }

@@ -11,6 +11,17 @@
   overflow: hidden;
 }
 
+.below {
+  justify-content: flex-start;
+}
+
+.chatLayer {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  order: 0;
+}
 
 .petWrapper {
   cursor: grab;
@@ -21,6 +32,15 @@
   filter: drop-shadow(0 10px 12px rgb(0 0 0 / 26%));
   transition: transform 140ms ease, filter 140ms ease;
   transform-origin: center bottom;
+  order: 1;
+}
+
+.below .chatLayer {
+  order: 1;
+}
+
+.below .petWrapper {
+  order: 0;
 }
 
 .petWrapper:hover {

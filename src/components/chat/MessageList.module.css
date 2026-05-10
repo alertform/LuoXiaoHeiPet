@@ -49,6 +49,13 @@
   border-bottom-right-radius: 5px;
 }
 
+.queued .bubble {
+  background: rgba(47, 143, 91, 0.12);
+  border: 1px dashed rgba(47, 143, 91, 0.38);
+  color: #1f5a3d;
+  box-shadow: none;
+}
+
 .assistant .bubble {
   background: #ffffff;
   color: #1f2a24;
@@ -161,6 +168,12 @@
 
   .user .bubble {
     background: #2c8f5a;
+  }
+
+  .queued .bubble {
+    background: rgba(87, 185, 121, 0.12);
+    border-color: rgba(141, 189, 152, 0.36);
+    color: #cfe4d5;
   }
 
   .toolStatus {

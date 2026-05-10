@@ -26,7 +26,7 @@
 - Cross-platform system TTS voice (toggle in settings)
 - Three-layer memory system (working / session / long-term)
 - System tray menu (show/hide, settings, quit)
-- OpenRouter model access with presets for Claude, DeepSeek, MiniMax, Qwen, and OpenAI
+- Direct model provider access for Claude, DeepSeek, MiniMax, and Qwen, plus OpenRouter
 - Persistent settings (API Key, model, TTS, and memory options survive restarts)
 
 ## Requirements
@@ -48,36 +48,30 @@ npm install
 npm run tauri dev
 ```
 
-After first launch, open **Settings** from the system tray menu and configure OpenRouter.
+After first launch, open **Settings** from the system tray menu and configure a model provider.
 
-You can provide the OpenRouter key in either way:
+You can provide the API key in either way:
 
 - Enter it in **Settings -> Model**
-- Or set `OPENROUTER_API_KEY` in the environment before starting the app
+- Or set the matching environment variable before starting the app
 
 ```bash
-export OPENROUTER_API_KEY="sk-or-v1-..."
+export DEEPSEEK_API_KEY="sk-..."
 npm run tauri dev
 ```
 
-Default endpoint is fixed internally:
+Supported providers:
 
-```text
-https://openrouter.ai/api/v1/chat/completions
-```
+| Provider | Endpoint | Environment variable |
+|----------|----------|----------------------|
+| Claude / Anthropic | `https://api.anthropic.com/v1/messages` | `ANTHROPIC_API_KEY` |
+| DeepSeek | `https://api.deepseek.com/chat/completions` | `DEEPSEEK_API_KEY` |
+| MiniMax | `https://api.minimax.io/v1/chat/completions` | `MINIMAX_API_KEY` |
+| Qwen / DashScope | `https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions` | `DASHSCOPE_API_KEY` |
+| OpenRouter | `https://openrouter.ai/api/v1/chat/completions` | `OPENROUTER_API_KEY` |
 
-The settings panel includes quick model presets:
-
-- Claude Sonnet: `anthropic/claude-sonnet-4.5`
-- Claude Haiku: `anthropic/claude-haiku-4.5`
-- DeepSeek V4: `deepseek/deepseek-v4-pro`
-- DeepSeek Chat: `deepseek/deepseek-chat-v3.1`
-- MiniMax M2.7: `minimax/minimax-m2.7`
-- Qwen Plus: `qwen/qwen3.6-plus`
-- Qwen Coder: `qwen/qwen3-coder-plus`
-- OpenAI GPT-5.2: `openai/gpt-5.2`
-
-You can also type any other OpenRouter model id manually.
+The settings panel includes provider-specific model presets, and you can also
+type any supported model id manually.
 
 ## Usage
 
@@ -87,6 +81,17 @@ You can also type any other OpenRouter model id manually.
 - Use **Settings -> Model** to change API Key, model, temperature, max tokens, and system prompt
 - Use **Settings -> Voice** to toggle TTS
 - Use **Settings -> Memory** to toggle or clear long-term memory
+
+### Optional Edge TTS
+
+The Voice settings support an optional Edge online TTS engine for more natural
+Chinese voices. Install the Python package first:
+
+```bash
+python3 -m pip install edge-tts
+```
+
+If Edge TTS is unavailable, the app falls back to the system TTS voice.
 
 ## Animation Assets
 
@@ -120,7 +125,7 @@ the idle preview/placeholder.
 ├── src-tauri/
 │   ├── src/
 │   │   ├── commands/       Tauri commands (llm / file_tools / config / memory / tts)
-│   │   ├── services/       Business logic (OpenRouter SSE, file tools, memory, TTS)
+│   │   ├── services/       Business logic (provider SSE, file tools, memory, TTS)
 │   │   └── models/         Data models (chat / config / memory)
 │   ├── resources/animations/   Animation frame assets (PNG)
 │   ├── icons/              App icons

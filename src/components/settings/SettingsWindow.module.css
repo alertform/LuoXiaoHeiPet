@@ -53,7 +53,7 @@
 .tabs {
   margin: 14px 18px 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 3px;
   padding: 3px;
   background: #0d1a15;
@@ -130,6 +130,13 @@
   font-size: 12px;
   font-weight: 650;
   color: #b9d4c1;
+}
+
+.inlineHint {
+  margin: -3px 0 0;
+  color: #8ca995;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .form input:not([type]),
@@ -308,4 +315,122 @@
 .dangerBtn:hover {
   background: rgba(176, 68, 68, 0.18);
   border-color: rgba(240, 163, 163, 0.34);
+}
+
+.secondaryBtn {
+  align-self: flex-start;
+  height: 32px;
+  padding: 0 13px;
+  background: #102018;
+  color: #bde0c7;
+  border: 1px solid #244635;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.secondaryBtn:hover {
+  background: #152b20;
+  border-color: #3d8e5a;
+}
+
+.actionRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.usageSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.usageMetric {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #1f3c2e;
+  border-radius: 9px;
+  background: #09130f;
+}
+
+.usageMetric span {
+  display: block;
+  color: #8ca995;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.usageMetric strong {
+  display: block;
+  color: #e9f8ee;
+  font-size: 16px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.emptyState {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #244635;
+  border-radius: 9px;
+  color: #8ca995;
+  font-size: 12px;
+}
+
+.usageTable {
+  border: 1px solid #1b3a2b;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.usageRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 54px 74px 74px 74px;
+  gap: 8px;
+  align-items: center;
+  padding: 9px 10px;
+  border-top: 1px solid #14271e;
+  color: #cce5d3;
+  font-size: 12px;
+}
+
+.usageRow:first-child {
+  border-top: 0;
+}
+
+.usageRow > span {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.usageHead {
+  background: #0a1511;
+  color: #88a493;
+  font-weight: 700;
+}
+
+.usageModel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.usageModel strong {
+  color: #e9f8ee;
+  font-size: 12px;
+}
+
+.usageModel span,
+.usageModel small {
+  color: #8ca995;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
