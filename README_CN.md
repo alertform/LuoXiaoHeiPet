@@ -59,6 +59,17 @@ npm run tauri dev
 
 无素材时自动显示内置占位小黑猫。
 
+重建内置的公开来源小黑素材：
+
+```bash
+python3 -m venv /tmp/luoxiaohei-assets-venv
+/tmp/luoxiaohei-assets-venv/bin/python -m pip install -r tools/requirements.txt
+/tmp/luoxiaohei-assets-venv/bin/python tools/build_xiaohei_assets.py
+```
+
+构建脚本会把源图片/GIF 下载到临时目录，规范化输出到
+`src-tauri/resources/animations/`，然后删除原始下载文件。
+
 ## 项目结构
 
 ```

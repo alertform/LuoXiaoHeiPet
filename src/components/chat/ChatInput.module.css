@@ -1,28 +1,31 @@
 .inputRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 10px 10px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 10px 11px;
+  background: rgba(245, 249, 246, 0.92);
+  border-top: 1px solid rgba(45, 79, 61, 0.1);
 }
 
 .input {
   flex: 1;
   height: 32px;
-  padding: 0 10px;
-  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  padding: 0 12px;
+  border: 1px solid rgba(45, 79, 61, 0.14);
   border-radius: 16px;
   font-size: 13px;
   outline: none;
-  background: rgba(0, 0, 0, 0.03);
-  color: #333;
-  transition: border-color 0.15s;
+  background: #ffffff;
+  color: #1f2a24;
+  transition: border-color 0.15s, box-shadow 0.15s;
   user-select: text;
   -webkit-user-select: text;
 }
 
 .input:focus {
-  border-color: #4f86f7;
+  border-color: #2f8f5b;
+  box-shadow: 0 0 0 3px rgba(47, 143, 91, 0.12);
 }
 
 .input:disabled {
@@ -42,11 +45,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.15s, background 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .sendBtn {
-  background: #4f86f7;
+  background: #2f8f5b;
   color: white;
 }
 
@@ -56,23 +63,24 @@
 }
 
 .cancelBtn {
-  background: #ff4444;
+  background: #c94848;
   color: white;
   font-size: 12px;
 }
 
 @media (prefers-color-scheme: dark) {
   .inputRow {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    background: rgba(19, 24, 22, 0.92);
+    border-top-color: rgba(141, 189, 152, 0.12);
   }
 
   .input {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: #e8e8e8;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(141, 189, 152, 0.16);
+    color: #e8f0ea;
   }
 
   .input:focus {
-    border-color: #4f86f7;
+    border-color: #57b979;
   }
 }

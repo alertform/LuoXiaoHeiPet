@@ -1,0 +1,113 @@
+{
+  "notes": [
+    "Public-source-first asset manifest for rebuilding the bundled desktop pet frames.",
+    "Raw downloaded files are temporary build inputs and should not be committed.",
+    "Tenor pages are kept as preferred public GIF references, but the builder falls back to Fandom-hosted public art when Tenor cannot be reached from the local network."
+  ],
+  "references": [
+    {
+      "label": "罗小黑战记角色说明",
+      "url": "https://zh.wikipedia.org/wiki/%E7%BD%97%E5%B0%8F%E9%BB%91%E6%88%98%E8%AE%B0"
+    },
+    {
+      "label": "Luo Xiaohei Wiki character page",
+      "url": "https://luoxiaohei.fandom.com/wiki/Luo_Xiaohei"
+    },
+    {
+      "label": "Tenor: Luoxiaohei Cat GIF",
+      "url": "https://tenor.com/view/luoxiaohei-cat-gif-11183898"
+    },
+    {
+      "label": "Tenor: 罗小黑 Sticker",
+      "url": "https://tenor.com/view/%E7%BD%97%E5%B0%8F%E9%BB%91-gif-25496569"
+    },
+    {
+      "label": "Tenor: 罗小黑/罗小黑战记 GIF",
+      "url": "https://tenor.com/ja/view/%E7%BD%97%E5%B0%8F%E9%BB%91-%E7%BD%97%E5%B0%8F%E9%BB%91%E6%88%98%E8%AE%B0-%E7%BD%97%E5%B0%8F%E9%BB%91%E8%A1%A8%E6%83%85-luo-xiaohei-the-legend-of-hei-gif-17431301926317481942"
+    }
+  ],
+  "sources": {
+    "tenor_luoxiaohei_cat": {
+      "type": "tenor_page",
+      "url": "https://tenor.com/view/luoxiaohei-cat-gif-11183898"
+    },
+    "tenor_xiaohei_sticker": {
+      "type": "tenor_page",
+      "url": "https://tenor.com/view/%E7%BD%97%E5%B0%8F%E9%BB%91-gif-25496569"
+    },
+    "expression_diagram": {
+      "type": "fandom_file",
+      "file": "Expressions Diagram.jpg",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Expressions_Diagram.jpg",
+      "sprites": {
+        "normal": [24, 174, 90, 241],
+        "happy": [103, 174, 170, 241],
+        "mad": [183, 174, 249, 241],
+        "sad": [263, 174, 329, 241],
+        "shy": [343, 174, 409, 241],
+        "crying": [24, 313, 90, 380],
+        "anxious": [103, 313, 170, 380],
+        "surprised": [183, 313, 249, 380],
+        "cool": [263, 313, 329, 380],
+        "cold": [343, 313, 409, 380]
+      }
+    },
+    "christmas_2013": {
+      "type": "fandom_file",
+      "file": "Christmas 2013.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Christmas_2013.gif"
+    },
+    "wechat_1": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 1.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_1.gif"
+    },
+    "wechat_2": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 2.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_2.gif"
+    },
+    "wechat_3": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 3.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_3.gif"
+    },
+    "wechat_4": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 4.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_4.gif"
+    },
+    "wechat_5": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 5.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_5.gif"
+    },
+    "wechat_6": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 6.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_6.gif"
+    },
+    "wechat_7": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 7.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_7.gif"
+    },
+    "wechat_8": {
+      "type": "fandom_file",
+      "file": "Wechat Stickers 8.gif",
+      "description_url": "https://luoxiaohei.fandom.com/wiki/File:Wechat_Stickers_8.gif"
+    }
+  },
+  "states": {
+    "idle": { "source": "wechat_2", "fallback_sprite": "normal", "frames": 12, "duration_ms": 120 },
+    "walk": { "source": "wechat_1", "fallback_sprite": "normal", "frames": 8, "duration_ms": 90 },
+    "sleep": { "source": "wechat_5", "fallback_sprite": "sad", "frames": 8, "duration_ms": 180 },
+    "happy": { "source": "wechat_4", "fallback_sprite": "happy", "frames": 8, "duration_ms": 80 },
+    "stretch": { "source": "wechat_8", "fallback_sprite": "shy", "frames": 8, "duration_ms": 110 },
+    "lookAround": { "source": "wechat_6", "fallback_sprite": "cool", "frames": 8, "duration_ms": 110 },
+    "talking": { "source": "wechat_2", "fallback_sprite": "surprised", "frames": 8, "duration_ms": 90 },
+    "thinking": { "source": "wechat_6", "fallback_sprite": "anxious", "frames": 8, "duration_ms": 140 },
+    "drag": { "source": "wechat_1", "fallback_sprite": "surprised", "frames": 8, "duration_ms": 90 },
+    "fall": { "source": "wechat_5", "fallback_sprite": "crying", "frames": 8, "duration_ms": 70 }
+  }
+}

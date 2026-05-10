@@ -59,6 +59,17 @@ Supported states: `idle` `sleep` `walk` `happy` `stretch` `lookAround` `talking`
 
 A built-in placeholder cat is shown when no assets are available.
 
+To rebuild the bundled public-source Xiaohei assets:
+
+```bash
+python3 -m venv /tmp/luoxiaohei-assets-venv
+/tmp/luoxiaohei-assets-venv/bin/python -m pip install -r tools/requirements.txt
+/tmp/luoxiaohei-assets-venv/bin/python tools/build_xiaohei_assets.py
+```
+
+The builder downloads source images/GIFs into a temporary directory, normalizes
+them into `src-tauri/resources/animations/`, then deletes the raw downloads.
+
 ## Project Structure
 
 ```

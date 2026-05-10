@@ -7,8 +7,12 @@ interface PetCanvasProps {
 
 export function PetCanvas({ frame, size = 128 }: PetCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const src = frame?.src ?? "";
+  const isGif = src.toLowerCase().includes(".gif");
 
   useEffect(() => {
+    if (isGif) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -26,14 +30,33 @@ export function PetCanvas({ frame, size = 128 }: PetCanvasProps) {
     const y = (size - h) / 2;
 
     ctx.drawImage(frame, x, y, w, h);
-  }, [frame, size]);
+  }, [frame, isGif, size]);
+
+  if (frame && isGif) {
+    return (
+      <img
+        src={src}
+        width={size}
+        height={size}
+        draggable={false}
+        style={{
+          display: "block",
+          width: size,
+          height: size,
+          objectFit: "contain",
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      />
+    );
+  }
 
   return (
     <canvas
       ref={canvasRef}
       width={size}
       height={size}
-      style={{ display: "block", imageRendering: "pixelated" }}
+      style={{ display: "block", imageRendering: "auto" }}
     />
   );
 }

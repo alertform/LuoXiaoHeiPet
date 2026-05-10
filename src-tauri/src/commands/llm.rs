@@ -51,10 +51,7 @@ pub fn get_animation_frames(state_name: String) -> Vec<String> {
 
 /// 保存 LLM 配置（供设置窗口调用）
 #[tauri::command]
-pub async fn save_llm_config(
-    config: LLMConfig,
-    state: State<'_, AppState>,
-) -> Result<(), String> {
+pub async fn save_llm_config(config: LLMConfig, state: State<'_, AppState>) -> Result<(), String> {
     *state.config.lock().await = config;
     Ok(())
 }

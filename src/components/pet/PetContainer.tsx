@@ -9,7 +9,7 @@ import { useDrag } from "../../hooks/useDrag";
 import styles from "./PetContainer.module.css";
 
 const PET_SIZE = 128;
-const CHAT_HEIGHT = 400;
+const CHAT_HEIGHT = 360;
 const CHAT_WIDTH = 280;
 
 interface PetContainerProps {

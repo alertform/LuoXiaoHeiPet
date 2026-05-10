@@ -1,4 +1,7 @@
-use crate::{models::config::{AppSettings, LLMConfig}, AppState};
+use crate::{
+    models::config::{AppSettings, LLMConfig},
+    AppState,
+};
 use tauri::{AppHandle, State};
 use tauri_plugin_store::StoreExt;
 
@@ -7,13 +10,12 @@ const KEY_LLM_CONFIG: &str = "llm_config";
 const KEY_APP_SETTINGS: &str = "app_settings";
 
 #[tauri::command]
-pub async fn load_config(
-    app: AppHandle,
-    state: State<'_, AppState>,
-) -> Result<LLMConfig, String> {
+pub async fn load_config(app: AppHandle, state: State<'_, AppState>) -> Result<LLMConfig, String> {
     let store = app.store(STORE_FILE).map_err(|e| e.to_string())?;
     if let Some(val) = store.get(KEY_LLM_CONFIG) {
         if let Ok(config) = serde_json::from_value::<LLMConfig>(val) {
+            let mut config = config;
+            config.normalize_openrouter();
             *state.config.lock().await = config.clone();
             return Ok(config);
         }
@@ -27,6 +29,8 @@ pub async fn save_config(
     app: AppHandle,
     state: State<'_, AppState>,
 ) -> Result<(), String> {
+    let mut config = config;
+    config.normalize_openrouter();
     *state.config.lock().await = config.clone();
     let store = app.store(STORE_FILE).map_err(|e| e.to_string())?;
     let val = serde_json::to_value(&config).map_err(|e| e.to_string())?;

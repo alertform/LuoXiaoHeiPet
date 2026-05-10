@@ -1,4 +1,7 @@
-use crate::{models::{chat::ChatMessage, memory::LongTermMemory}, AppState};
+use crate::{
+    models::{chat::ChatMessage, memory::LongTermMemory},
+    AppState,
+};
 use tauri::State;
 
 #[tauri::command]

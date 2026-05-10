@@ -266,7 +266,11 @@ fn append_file(path: &str, content: &str) -> String {
         return "权限不足：不允许写入此路径".into();
     }
     use std::io::Write;
-    match fs::OpenOptions::new().create(true).append(true).open(&resolved) {
+    match fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&resolved)
+    {
         Ok(mut f) => match f.write_all(content.as_bytes()) {
             Ok(_) => format!("内容已追加到: {path}"),
             Err(e) => format!("追加失败: {e}"),
@@ -364,17 +368,13 @@ fn search_files(directory: &str, keyword: &str, max_results: usize) -> String {
     }
 }
 
-fn search_recursive(
-    root: &Path,
-    dir: &Path,
-    keyword: &str,
-    results: &mut Vec<String>,
-    max: usize,
-) {
+fn search_recursive(root: &Path, dir: &Path, keyword: &str, results: &mut Vec<String>, max: usize) {
     if results.len() >= max {
         return;
     }
-    let Ok(entries) = fs::read_dir(dir) else { return };
+    let Ok(entries) = fs::read_dir(dir) else {
+        return;
+    };
     for entry in entries.filter_map(|e| e.ok()) {
         if results.len() >= max {
             break;
@@ -387,7 +387,11 @@ fn search_recursive(
                 .unwrap_or(&entry.path())
                 .to_string_lossy()
                 .to_string();
-            let icon = if entry.path().is_dir() { "📁" } else { "📄" };
+            let icon = if entry.path().is_dir() {
+                "📁"
+            } else {
+                "📄"
+            };
             results.push(format!("{icon} {rel}"));
         }
         if entry.path().is_dir() {

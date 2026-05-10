@@ -1,4 +1,5 @@
 export interface LLMConfig {
+  provider: "openrouter";
   api_key: string;
   endpoint: string;
   model: string;
@@ -14,9 +15,10 @@ export interface AppSettings {
 }
 
 export const DEFAULT_CONFIG: LLMConfig = {
+  provider: "openrouter",
   api_key: "",
-  endpoint: "https://ark.cn-beijing.volces.com/api/coding/v3/chat/completions",
-  model: "doubao-seed-2.0-pro",
+  endpoint: "https://openrouter.ai/api/v1/chat/completions",
+  model: "anthropic/claude-sonnet-4.5",
   temperature: 0.7,
   max_tokens: 1024,
   system_prompt:

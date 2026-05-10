@@ -18,8 +18,17 @@
   height: 128px;
   flex-shrink: 0;
   border-radius: 24px;
+  filter: drop-shadow(0 10px 12px rgb(0 0 0 / 26%));
+  transition: transform 140ms ease, filter 140ms ease;
+  transform-origin: center bottom;
+}
+
+.petWrapper:hover {
+  filter: drop-shadow(0 12px 14px rgb(0 0 0 / 30%));
+  transform: translateY(-2px);
 }
 
 .petWrapper:active {
   cursor: grabbing;
+  transform: translateY(1px) scale(0.98);
 }

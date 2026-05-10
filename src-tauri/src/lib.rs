@@ -4,6 +4,7 @@ use crate::{
 };
 use commands::{config::*, file_tools::*, llm::*, memory::*, tts::*};
 use tauri::{
+    image::Image,
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, WebviewWindowBuilder,
@@ -74,6 +75,8 @@ pub fn run() {
                 if let Ok(store) = app.handle().store("settings.json") {
                     if let Some(val) = store.get("llm_config") {
                         if let Ok(config) = serde_json::from_value::<LLMConfig>(val) {
+                            let mut config = config;
+                            config.normalize_openrouter();
                             let state = app.state::<AppState>();
                             *state.config.blocking_lock() = config;
                         }
@@ -87,8 +90,15 @@ pub fn run() {
                 }
             }
 
-            setup_tray(app.handle())?;
+            let app_icon = load_runtime_app_icon();
+            #[cfg(target_os = "macos")]
+            set_macos_dock_icon();
+
+            setup_tray(app.handle(), app_icon.clone())?;
             if let Some(window) = app.get_webview_window("pet") {
+                if let Some(icon) = app_icon {
+                    let _ = window.set_icon(icon);
+                }
                 let _ = window.set_always_on_top(true);
                 #[cfg(target_os = "macos")]
                 {
@@ -98,7 +108,8 @@ pub fn run() {
                         #[allow(deprecated)]
                         unsafe {
                             let ns_window: id = webview.ns_window() as id;
-                            ns_window.setBackgroundColor_(NSColor::clearColor(std::ptr::null_mut()));
+                            ns_window
+                                .setBackgroundColor_(NSColor::clearColor(std::ptr::null_mut()));
                             ns_window.setOpaque_(NO);
                         }
                     });
@@ -112,15 +123,46 @@ pub fn run() {
         .expect("error while running tauri application");
 }
 
-fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
+fn load_runtime_app_icon() -> Option<Image<'static>> {
+    Image::from_bytes(include_bytes!("../icons/128x128@2x.png")).ok()
+}
+
+#[cfg(target_os = "macos")]
+#[allow(deprecated)]
+fn set_macos_dock_icon() {
+    use cocoa::appkit::{NSApp, NSApplication, NSImage};
+    use cocoa::base::nil;
+    use cocoa::foundation::{NSData, NSUInteger};
+    use std::ffi::c_void;
+
+    let icon_bytes = include_bytes!("../icons/128x128@2x.png");
+
+    unsafe {
+        let data = NSData::dataWithBytes_length_(
+            nil,
+            icon_bytes.as_ptr() as *const c_void,
+            icon_bytes.len() as NSUInteger,
+        );
+        let image = NSImage::initWithData_(NSImage::alloc(nil), data);
+        if image != nil {
+            NSApp().setApplicationIconImage_(image);
+        }
+    }
+}
+
+fn setup_tray(app: &AppHandle, runtime_icon: Option<Image<'static>>) -> tauri::Result<()> {
     let show_hide = MenuItem::with_id(app, "show_hide", "显示/隐藏小黑", true, None::<&str>)?;
     let settings = MenuItem::with_id(app, "settings", "设置...", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "退出", true, None::<&str>)?;
 
     let menu = Menu::with_items(app, &[&show_hide, &settings, &quit])?;
+    let tray_icon = runtime_icon
+        .or_else(|| app.default_window_icon().cloned())
+        .expect("application icon should be available");
 
     TrayIconBuilder::new()
-        .icon(app.default_window_icon().cloned().unwrap())
+        .icon(tray_icon)
+        .icon_as_template(false)
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show_hide" => {
@@ -166,11 +208,21 @@ fn open_settings(app: &AppHandle) {
         let _ = w.set_focus();
         return;
     }
-    let _ = WebviewWindowBuilder::new(app, "settings", tauri::WebviewUrl::App("index.html#settings".into()))
-        .title("罗小黑桌宠 - 设置")
-        .inner_size(500.0, 520.0)
-        .resizable(false)
-        .decorations(false)
-        .center()
-        .build();
+    let window = WebviewWindowBuilder::new(
+        app,
+        "settings",
+        tauri::WebviewUrl::App("index.html#settings".into()),
+    )
+    .title("罗小黑桌宠 - 设置")
+    .inner_size(500.0, 520.0)
+    .resizable(false)
+    .decorations(false)
+    .center()
+    .build();
+
+    if let Ok(window) = window {
+        if let Some(icon) = load_runtime_app_icon() {
+            let _ = window.set_icon(icon);
+        }
+    }
 }

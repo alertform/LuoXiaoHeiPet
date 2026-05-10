@@ -3,7 +3,7 @@ use crate::models::{
     config::LLMConfig,
 };
 use futures_util::StreamExt;
-use reqwest::Client;
+use reqwest::{Client, RequestBuilder};
 use serde_json::{json, Value};
 use std::sync::Arc;
 use tauri::{AppHandle, Emitter};
@@ -40,23 +40,27 @@ impl VolcanoEngineService {
         }
 
         let body = build_request_body(&config, messages, false, enable_file_tools);
-        let resp = self
-            .client
-            .post(&config.endpoint)
-            .bearer_auth(&config.api_key)
+        let resp = with_provider_headers(self.client.post(&config.endpoint), &config)
             .json(&body)
             .send()
             .await
             .map_err(|e| format!("网络错误: {e}"))?;
 
         let status = resp.status();
-        let text = resp.text().await.map_err(|e| format!("读取响应失败: {e}"))?;
+        let text = resp
+            .text()
+            .await
+            .map_err(|e| format!("读取响应失败: {e}"))?;
 
         if !status.is_success() {
             if status.as_u16() == 429 {
                 return Err("请求过于频繁，请稍后再试".into());
             }
-            return Err(format!("服务器错误 {}: {}", status, &text[..text.len().min(200)]));
+            return Err(format!(
+                "服务器错误 {}: {}",
+                status,
+                &text[..text.len().min(200)]
+            ));
         }
 
         parse_non_stream_response(&text)
@@ -74,10 +78,7 @@ impl VolcanoEngineService {
         }
 
         let body = build_request_body(&config, messages, true, enable_file_tools);
-        let resp = self
-            .client
-            .post(&config.endpoint)
-            .bearer_auth(&config.api_key)
+        let resp = with_provider_headers(self.client.post(&config.endpoint), &config)
             .json(&body)
             .send()
             .await
@@ -110,7 +111,10 @@ impl VolcanoEngineService {
                 if let Ok(chunk_val) = serde_json::from_str::<Value>(json_str) {
                     let delta = &chunk_val["choices"][0]["delta"];
                     // 思考过程
-                    if let Some(reasoning) = delta["reasoning_content"].as_str() {
+                    if let Some(reasoning) = delta["reasoning_content"]
+                        .as_str()
+                        .or_else(|| delta["reasoning"].as_str())
+                    {
                         if !reasoning.is_empty() {
                             let _ = app.emit("llm-reasoning", reasoning);
                         }
@@ -130,15 +134,26 @@ impl VolcanoEngineService {
     }
 }
 
+fn with_provider_headers(request: RequestBuilder, config: &LLMConfig) -> RequestBuilder {
+    let request = request.bearer_auth(config.effective_api_key());
+
+    if config.is_openrouter() {
+        request
+            .header("HTTP-Referer", "https://github.com/alertform/LuoXiaoHeiPet")
+            .header("X-OpenRouter-Title", "Luo Xiaohei Pet")
+    } else {
+        request
+    }
+}
+
 fn build_request_body(
     config: &LLMConfig,
     messages: &[ChatMessage],
     stream: bool,
     enable_file_tools: bool,
 ) -> Value {
-    let mut api_messages: Vec<Value> = vec![
-        json!({ "role": "system", "content": config.system_prompt })
-    ];
+    let mut api_messages: Vec<Value> =
+        vec![json!({ "role": "system", "content": config.system_prompt })];
 
     for msg in messages {
         let role = match msg.role {
@@ -158,14 +173,16 @@ fn build_request_body(
             if let Some(tool_calls) = &msg.tool_calls {
                 let tc_array: Vec<Value> = tool_calls
                     .iter()
-                    .map(|tc| json!({
-                        "id": tc.id,
-                        "type": "function",
-                        "function": {
-                            "name": tc.function_name,
-                            "arguments": tc.arguments
-                        }
-                    }))
+                    .map(|tc| {
+                        json!({
+                            "id": tc.id,
+                            "type": "function",
+                            "function": {
+                                "name": tc.function_name,
+                                "arguments": tc.arguments
+                            }
+                        })
+                    })
                     .collect();
                 api_messages.push(json!({
                     "role": "assistant",
@@ -196,8 +213,7 @@ fn build_request_body(
 }
 
 fn parse_non_stream_response(text: &str) -> Result<LLMResponse, String> {
-    let val: Value =
-        serde_json::from_str(text).map_err(|e| format!("JSON 解析失败: {e}"))?;
+    let val: Value = serde_json::from_str(text).map_err(|e| format!("JSON 解析失败: {e}"))?;
 
     let message = &val["choices"][0]["message"];
     let content = message["content"].as_str().unwrap_or("").to_string();
@@ -207,7 +223,10 @@ fn parse_non_stream_response(text: &str) -> Result<LLMResponse, String> {
         for tc in tcs {
             let id = tc["id"].as_str().unwrap_or("").to_string();
             let name = tc["function"]["name"].as_str().unwrap_or("").to_string();
-            let args = tc["function"]["arguments"].as_str().unwrap_or("{}").to_string();
+            let args = tc["function"]["arguments"]
+                .as_str()
+                .unwrap_or("{}")
+                .to_string();
             tool_calls.push(ToolCall {
                 id,
                 function_name: name,
@@ -216,5 +235,8 @@ fn parse_non_stream_response(text: &str) -> Result<LLMResponse, String> {
         }
     }
 
-    Ok(LLMResponse { content, tool_calls })
+    Ok(LLMResponse {
+        content,
+        tool_calls,
+    })
 }

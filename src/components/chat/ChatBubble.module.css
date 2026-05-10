@@ -2,10 +2,13 @@
   width: 100%;
   flex: 1;
   min-height: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(251, 253, 250, 0.98), rgba(242, 247, 243, 0.98));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(45, 79, 61, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 16px 34px rgba(12, 22, 18, 0.18), 0 2px 8px rgba(12, 22, 18, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -26,30 +29,34 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+  padding: 11px 14px 9px;
+  background: rgba(35, 48, 42, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .title {
   font-size: 13px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #f5fbf6;
+  letter-spacing: 0;
 }
 
 .closeBtn {
-  background: none;
+  background: rgba(255, 255, 255, 0.08);
   border: none;
   cursor: pointer;
   font-size: 12px;
-  color: #999;
-  padding: 2px 4px;
-  border-radius: 4px;
-  transition: background 0.15s;
+  color: rgba(245, 251, 246, 0.78);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
 }
 
 .closeBtn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  color: #666;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
 }
 
 .arrow {
@@ -58,23 +65,26 @@
 
 @media (prefers-color-scheme: dark) {
   .bubble {
-    background: rgba(30, 30, 32, 0.95);
+    background:
+      linear-gradient(180deg, rgba(29, 35, 32, 0.98), rgba(22, 27, 25, 0.98));
+    border-color: rgba(141, 189, 152, 0.16);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34), 0 2px 8px rgba(0, 0, 0, 0.22);
   }
 
   .header {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    background: rgba(14, 18, 16, 0.94);
   }
 
   .title {
-    color: #e8e8e8;
+    color: #edf6ee;
   }
 
   .closeBtn {
-    color: #666;
+    color: rgba(237, 246, 238, 0.7);
   }
 
   .closeBtn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #aaa;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
   }
 }

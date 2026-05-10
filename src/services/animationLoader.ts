@@ -14,44 +14,8 @@ export function getPlaceholderSync(): HTMLImageElement {
 function getPlaceholder(): HTMLImageElement {
   if (placeholderImg) return placeholderImg;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 128;
-  const ctx = canvas.getContext("2d")!;
-
-  // 绘制简单小黑猫剪影
-  ctx.fillStyle = "#1a1a1a";
-  // 身体
-  ctx.beginPath();
-  ctx.ellipse(64, 55, 34, 30, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // 头
-  ctx.beginPath();
-  ctx.arc(64, 30, 26, 0, Math.PI * 2);
-  ctx.fill();
-  // 左耳
-  ctx.beginPath();
-  ctx.moveTo(45, 14);
-  ctx.lineTo(35, -2);
-  ctx.lineTo(58, 10);
-  ctx.fill();
-  // 右耳
-  ctx.beginPath();
-  ctx.moveTo(83, 14);
-  ctx.lineTo(93, -2);
-  ctx.lineTo(70, 10);
-  ctx.fill();
-  // 眼睛
-  ctx.fillStyle = "#4ade80";
-  ctx.beginPath();
-  ctx.ellipse(55, 30, 6, 7, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.ellipse(73, 30, 6, 7, 0, 0, Math.PI * 2);
-  ctx.fill();
-
   const img = new Image();
-  img.src = canvas.toDataURL();
+  img.src = "/animations/xiaohei_idle.gif";
   placeholderImg = img;
   return img;
 }
@@ -65,6 +29,20 @@ async function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
+async function loadResourceImage(fileName: string): Promise<HTMLImageElement | null> {
+  try {
+    const resDir = await resourceDir();
+    const filePath = await join(resDir, "animations", fileName);
+    const url = convertFileSrc(filePath);
+    const img = await loadImage(url);
+    if (img) return img;
+  } catch {
+    // 普通浏览器 / Vite preview 下没有 Tauri resourceDir
+  }
+
+  return loadImage(`/animations/${fileName}`);
+}
+
 export async function loadFrames(state: AnimationStateName): Promise<HTMLImageElement[]> {
   if (frameCache.has(state)) {
     return frameCache.get(state)!;
@@ -72,18 +50,20 @@ export async function loadFrames(state: AnimationStateName): Promise<HTMLImageEl
 
   const frames: HTMLImageElement[] = [];
 
-  try {
-    const resDir = await resourceDir();
-    for (let i = 0; i < 100; i++) {
-      const fileName = `${state}_${String(i).padStart(3, "0")}.png`;
-      const filePath = await join(resDir, "animations", fileName);
-      const url = convertFileSrc(filePath);
-      const img = await loadImage(url);
-      if (!img) break;
-      frames.push(img);
+  if (state === "idle") {
+    const gif = await loadResourceImage("xiaohei_idle.gif");
+    if (gif) {
+      frames.push(gif);
+      frameCache.set(state, frames);
+      return frames;
     }
-  } catch {
-    // dev 模式下 resourceDir 可能不可用
+  }
+
+  for (let i = 0; i < 100; i++) {
+    const fileName = `${state}_${String(i).padStart(3, "0")}.png`;
+    const img = await loadResourceImage(fileName);
+    if (!img) break;
+    frames.push(img);
   }
 
   if (frames.length === 0) {

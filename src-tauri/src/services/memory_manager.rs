@@ -49,7 +49,13 @@ impl MemoryManager {
             parts.push(format!("【记住的事情】\n{}", s.join("\n")));
         }
 
-        let emotions: Vec<_> = self.long_term.emotional_memories.iter().rev().take(5).collect();
+        let emotions: Vec<_> = self
+            .long_term
+            .emotional_memories
+            .iter()
+            .rev()
+            .take(5)
+            .collect();
         if !emotions.is_empty() {
             let s: Vec<String> = emotions
                 .iter()
@@ -80,7 +86,10 @@ impl MemoryManager {
             parts.push(format!("【本次聊天概要】{}", self.session_summary));
         }
         if !self.session_topics.is_empty() {
-            parts.push(format!("【本次聊过的话题】{}", self.session_topics.join("、")));
+            parts.push(format!(
+                "【本次聊过的话题】{}",
+                self.session_topics.join("、")
+            ));
         }
 
         if parts.is_empty() {
@@ -168,7 +177,8 @@ impl MemoryManager {
         }
 
         // 职业
-        for pattern in &["我是做", "我的工作是", "我的职业是", "我是一个", "我是一名"] {
+        for pattern in &["我是做", "我的工作是", "我的职业是", "我是一个", "我是一名"]
+        {
             if let Some(idx) = text.find(pattern) {
                 let after = &text[idx + pattern.len()..];
                 let job = first_segment(after, 15);
@@ -184,7 +194,11 @@ impl MemoryManager {
                 let after = &text[idx + pattern.len()..];
                 let hobby = first_segment(after, 20);
                 if !hobby.is_empty() {
-                    self.add_fact(&format!("主人喜欢{hobby}"), MemoryCategory::Preference, timestamp);
+                    self.add_fact(
+                        &format!("主人喜欢{hobby}"),
+                        MemoryCategory::Preference,
+                        timestamp,
+                    );
                 }
             }
         }
@@ -269,7 +283,12 @@ impl MemoryManager {
         }
     }
 
-    fn add_fact(&mut self, content: &str, category: MemoryCategory, timestamp: chrono::DateTime<Utc>) {
+    fn add_fact(
+        &mut self,
+        content: &str,
+        category: MemoryCategory,
+        timestamp: chrono::DateTime<Utc>,
+    ) {
         let is_dup = self.long_term.facts.iter().any(|f| {
             f.content == content
                 || (f.content.len() > 5 && content.contains(&f.content))
@@ -288,7 +307,12 @@ impl MemoryManager {
         }
     }
 
-    fn add_emotional_memory(&mut self, content: &str, emotion: &str, timestamp: chrono::DateTime<Utc>) {
+    fn add_emotional_memory(
+        &mut self,
+        content: &str,
+        emotion: &str,
+        timestamp: chrono::DateTime<Utc>,
+    ) {
         self.long_term.emotional_memories.push(EmotionalMemory {
             content: content.into(),
             emotion: emotion.into(),
@@ -302,11 +326,9 @@ impl MemoryManager {
 
 fn first_segment(text: &str, max_chars: usize) -> String {
     let trimmed = text.trim();
-    let delimiters: &[char] = &['，', '。', '！', '？', '、', '；', '：', '\n', ',', '.', '!', '?', ';', ':', ' '];
-    let segment = trimmed
-        .split(delimiters)
-        .next()
-        .unwrap_or("")
-        .trim();
+    let delimiters: &[char] = &[
+        '，', '。', '！', '？', '、', '；', '：', '\n', ',', '.', '!', '?', ';', ':', ' ',
+    ];
+    let segment = trimmed.split(delimiters).next().unwrap_or("").trim();
     segment.chars().take(max_chars).collect()
 }
