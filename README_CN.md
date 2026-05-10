@@ -1,4 +1,4 @@
-# 罗小黑桌宠 🐱 — Tauri 跨平台版
+# 罗小黑桌宠 - Tauri 跨平台版
 
 中文 | [English](./README.md)
 
@@ -10,6 +10,12 @@
 ![Rust](https://img.shields.io/badge/Rust-1.85%2B-orange)
 ![React](https://img.shields.io/badge/React-18-61dafb)
 
+## 预览
+
+| 桌宠动画 | 应用图标 |
+|----------|----------|
+| ![罗小黑 idle 动画](public/animations/xiaohei_idle.gif) | ![罗小黑桌宠图标](src-tauri/icons/128x128@2x.png) |
+
 ## 功能
 
 - 透明无边框悬浮窗，始终置顶，可自由拖拽
@@ -20,7 +26,8 @@
 - 跨平台系统 TTS 语音朗读（可在设置中开关）
 - 三层记忆系统（工作记忆 / 会话记忆 / 长期记忆）
 - 系统托盘菜单（显示/隐藏、设置、退出）
-- 配置持久化（API Key 等重启后保留）
+- 通过 OpenRouter 统一接入模型，内置 Claude、DeepSeek、MiniMax、Qwen、OpenAI 快捷选项
+- 配置持久化（API Key、模型、语音、记忆设置等重启后保留）
 
 ## 环境要求
 
@@ -41,12 +48,47 @@ npm install
 npm run tauri dev
 ```
 
-首次启动后点击系统托盘图标 → **设置**，填入火山引擎 API Key。
+首次启动后点击系统托盘图标 -> **设置**，配置 OpenRouter。
 
-> 申请地址：[火山引擎 MaaS 平台](https://www.volcengine.com/product/ark)
-> 默认模型：`doubao-seed-2.0-pro`
+OpenRouter API Key 有两种配置方式：
 
-## 添加动画素材
+- 在 **设置 -> 模型** 中填写
+- 或在启动应用前设置环境变量 `OPENROUTER_API_KEY`
+
+```bash
+export OPENROUTER_API_KEY="sk-or-v1-..."
+npm run tauri dev
+```
+
+Endpoint 已固定在程序内部：
+
+```text
+https://openrouter.ai/api/v1/chat/completions
+```
+
+设置面板内置常用模型快捷选项：
+
+- Claude Sonnet: `anthropic/claude-sonnet-4.5`
+- Claude Haiku: `anthropic/claude-haiku-4.5`
+- DeepSeek V4: `deepseek/deepseek-v4-pro`
+- DeepSeek Chat: `deepseek/deepseek-chat-v3.1`
+- MiniMax M2.7: `minimax/minimax-m2.7`
+- Qwen Plus: `qwen/qwen3.6-plus`
+- Qwen Coder: `qwen/qwen3-coder-plus`
+- OpenAI GPT-5.2: `openai/gpt-5.2`
+
+也可以直接手动填写任意 OpenRouter model id。
+
+## 使用方式
+
+- 双击小黑打开或关闭聊天气泡
+- 拖拽小黑移动悬浮窗
+- 通过系统托盘菜单显示/隐藏、打开设置或退出
+- 在 **设置 -> 模型** 中修改 API Key、模型、温度、最大 Token 和系统提示词
+- 在 **设置 -> 语音** 中开关语音朗读
+- 在 **设置 -> 记忆** 中开关或清空长期记忆
+
+## 动画素材
 
 将 PNG 帧文件放入 `src-tauri/resources/animations/`，命名格式：
 
@@ -68,7 +110,8 @@ python3 -m venv /tmp/luoxiaohei-assets-venv
 ```
 
 构建脚本会把源图片/GIF 下载到临时目录，规范化输出到
-`src-tauri/resources/animations/`，然后删除原始下载文件。
+`src-tauri/resources/animations/` 和 `public/animations/`，然后删除原始下载文件。
+生成的 `xiaohei_idle.gif` 会作为 idle 预览和占位动画。
 
 ## 项目结构
 
@@ -76,7 +119,7 @@ python3 -m venv /tmp/luoxiaohei-assets-venv
 ├── src-tauri/
 │   ├── src/
 │   │   ├── commands/       Tauri 命令（llm / file_tools / config / memory / tts）
-│   │   ├── services/       业务逻辑（VolcanoEngine SSE、文件工具、记忆、TTS）
+│   │   ├── services/       业务逻辑（OpenRouter SSE、文件工具、记忆、TTS）
 │   │   └── models/         数据模型（chat / config / memory）
 │   ├── resources/animations/   动画帧素材（PNG）
 │   ├── icons/              应用图标
@@ -85,7 +128,7 @@ python3 -m venv /tmp/luoxiaohei-assets-venv
 │   ├── components/
 │   │   ├── pet/            PetCanvas、PetContainer
 │   │   ├── chat/           ChatBubble、MessageList、ChatInput
-│   │   └── settings/       SettingsWindow（LLM / TTS / 记忆）
+│   │   └── settings/       SettingsWindow（模型 / 语音 / 记忆）
 │   ├── hooks/
 │   │   ├── useAnimationEngine.ts   帧动画状态机
 │   │   ├── useChatManager.ts       聊天 + tool calling + 思考过程

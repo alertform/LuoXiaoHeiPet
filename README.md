@@ -1,4 +1,4 @@
-# LuoXiaoHei Desktop Pet 🐱 — Tauri Cross-Platform
+# LuoXiaoHei Desktop Pet - Tauri Cross-Platform
 
 [中文](./README_CN.md) | English
 
@@ -10,6 +10,12 @@
 ![Rust](https://img.shields.io/badge/Rust-1.85%2B-orange)
 ![React](https://img.shields.io/badge/React-18-61dafb)
 
+## Preview
+
+| Desktop Pet | App Icon |
+|-------------|----------|
+| ![Xiaohei idle animation](public/animations/xiaohei_idle.gif) | ![LuoXiaoHei Pet icon](src-tauri/icons/128x128@2x.png) |
+
 ## Features
 
 - Transparent borderless floating window, always on top, freely draggable
@@ -20,7 +26,8 @@
 - Cross-platform system TTS voice (toggle in settings)
 - Three-layer memory system (working / session / long-term)
 - System tray menu (show/hide, settings, quit)
-- Persistent configuration (API Key survives restarts)
+- OpenRouter model access with presets for Claude, DeepSeek, MiniMax, Qwen, and OpenAI
+- Persistent settings (API Key, model, TTS, and memory options survive restarts)
 
 ## Requirements
 
@@ -41,12 +48,47 @@ npm install
 npm run tauri dev
 ```
 
-After first launch, click the system tray icon -> **Settings**, and enter your Volcano Engine API Key.
+After first launch, open **Settings** from the system tray menu and configure OpenRouter.
 
-> Apply here: [Volcano Engine MaaS Platform](https://www.volcengine.com/product/ark)
-> Default model: `doubao-seed-2.0-pro`
+You can provide the OpenRouter key in either way:
 
-## Adding Animation Assets
+- Enter it in **Settings -> Model**
+- Or set `OPENROUTER_API_KEY` in the environment before starting the app
+
+```bash
+export OPENROUTER_API_KEY="sk-or-v1-..."
+npm run tauri dev
+```
+
+Default endpoint is fixed internally:
+
+```text
+https://openrouter.ai/api/v1/chat/completions
+```
+
+The settings panel includes quick model presets:
+
+- Claude Sonnet: `anthropic/claude-sonnet-4.5`
+- Claude Haiku: `anthropic/claude-haiku-4.5`
+- DeepSeek V4: `deepseek/deepseek-v4-pro`
+- DeepSeek Chat: `deepseek/deepseek-chat-v3.1`
+- MiniMax M2.7: `minimax/minimax-m2.7`
+- Qwen Plus: `qwen/qwen3.6-plus`
+- Qwen Coder: `qwen/qwen3-coder-plus`
+- OpenAI GPT-5.2: `openai/gpt-5.2`
+
+You can also type any other OpenRouter model id manually.
+
+## Usage
+
+- Double-click Xiaohei to open or close the chat bubble
+- Drag Xiaohei to move the floating pet window
+- Open the system tray menu for show/hide, settings, and quit
+- Use **Settings -> Model** to change API Key, model, temperature, max tokens, and system prompt
+- Use **Settings -> Voice** to toggle TTS
+- Use **Settings -> Memory** to toggle or clear long-term memory
+
+## Animation Assets
 
 Place PNG frame files in `src-tauri/resources/animations/`, naming format:
 
@@ -68,7 +110,9 @@ python3 -m venv /tmp/luoxiaohei-assets-venv
 ```
 
 The builder downloads source images/GIFs into a temporary directory, normalizes
-them into `src-tauri/resources/animations/`, then deletes the raw downloads.
+them into both `src-tauri/resources/animations/` and `public/animations/`,
+then deletes the raw downloads. The generated `xiaohei_idle.gif` is used as
+the idle preview/placeholder.
 
 ## Project Structure
 
@@ -76,7 +120,7 @@ them into `src-tauri/resources/animations/`, then deletes the raw downloads.
 ├── src-tauri/
 │   ├── src/
 │   │   ├── commands/       Tauri commands (llm / file_tools / config / memory / tts)
-│   │   ├── services/       Business logic (VolcanoEngine SSE, file tools, memory, TTS)
+│   │   ├── services/       Business logic (OpenRouter SSE, file tools, memory, TTS)
 │   │   └── models/         Data models (chat / config / memory)
 │   ├── resources/animations/   Animation frame assets (PNG)
 │   ├── icons/              App icons
@@ -85,7 +129,7 @@ them into `src-tauri/resources/animations/`, then deletes the raw downloads.
 │   ├── components/
 │   │   ├── pet/            PetCanvas, PetContainer
 │   │   ├── chat/           ChatBubble, MessageList, ChatInput
-│   │   └── settings/       SettingsWindow (LLM / TTS / Memory)
+│   │   └── settings/       SettingsWindow (Model / Voice / Memory)
 │   ├── hooks/
 │   │   ├── useAnimationEngine.ts   Frame animation state machine
 │   │   ├── useChatManager.ts       Chat + tool calling + reasoning display
