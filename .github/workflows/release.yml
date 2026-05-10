@@ -58,17 +58,24 @@ jobs:
           releaseBody: |
             ## LuoXiaoHei Desktop Pet ${{ github.ref_name }}
 
-            Cross-platform desktop pet with AI chat powered by Volcano Engine LLM.
+            Cross-platform desktop pet with streaming AI chat, tool calling, and TTS.
+            Multi-model routing via **OpenRouter** (any compatible model) with optional Volcano Engine TTS.
+
+            ### Highlights
+            - 10+ animated states (idle / walk / drag / fall / happy / sleep / talking / thinking …)
+            - Reasoning UI for chain-of-thought streaming
+            - Tool calling architecture
+            - Configurable model + endpoint via Settings panel
 
             ### Downloads
-            - **macOS**: `.dmg` (Universal - Intel + Apple Silicon)
+            - **macOS**: `.dmg` (Universal — Intel + Apple Silicon)
             - **Windows**: `.msi` / `.exe`
-            - **Linux**: `.deb` / `.AppImage`
+            - **Linux**: `.deb` / `.AppImage` / `.rpm`
 
             ### First Run
             1. Launch the app
-            2. Click the tray icon → Settings
-            3. Enter your Volcano Engine API Key
+            2. Tray icon → Settings
+            3. Enter `OPENROUTER_API_KEY` (or set as environment variable before launch)
           releaseDraft: false
-          prerelease: false
+          prerelease: ${{ startsWith(github.ref_name, 'v0.') }}
           args: ${{ matrix.args }}
