@@ -13,6 +13,15 @@ export interface AppSettings {
   tts_provider: "system" | "edge";
   tts_voice_type: string;
   memory_enabled: boolean;
+  interaction_level: "off" | "low" | "standard" | "active";
+}
+
+export function normalizeAppSettings(settings: AppSettings): AppSettings {
+  const levels = new Set(["off", "low", "standard", "active"]);
+  return {
+    ...settings,
+    interaction_level: levels.has(settings.interaction_level) ? settings.interaction_level : "low",
+  };
 }
 
 export const DEFAULT_SYSTEM_PROMPT =

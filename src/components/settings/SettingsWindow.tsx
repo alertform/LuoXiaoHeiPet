@@ -9,7 +9,12 @@ import {
 } from "../../services/tauriCommands";
 import type { TokenUsageStats } from "../../types/chat";
 import type { AppSettings, LLMConfig } from "../../types/config";
-import { DEFAULT_CONFIG, DEFAULT_SYSTEM_PROMPT, LEGACY_SYSTEM_PROMPT } from "../../types/config";
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_SYSTEM_PROMPT,
+  LEGACY_SYSTEM_PROMPT,
+  normalizeAppSettings,
+} from "../../types/config";
 import styles from "./SettingsWindow.module.css";
 
 const PROVIDERS = {
@@ -101,20 +106,21 @@ function normalizeProviderConfig(config: LLMConfig): LLMConfig {
 }
 
 export function SettingsWindow() {
-  const [tab, setTab] = useState<"llm" | "tts" | "memory" | "usage">("llm");
+  const [tab, setTab] = useState<"llm" | "tts" | "memory" | "interaction" | "usage">("llm");
   const [config, setConfig] = useState<LLMConfig>(DEFAULT_CONFIG);
   const [settings, setSettings] = useState<AppSettings>({
     tts_enabled: true,
     tts_provider: "system",
     tts_voice_type: "Tingting",
     memory_enabled: true,
+    interaction_level: "low",
   });
   const [usageStats, setUsageStats] = useState<TokenUsageStats[]>([]);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     loadConfig().then((loaded) => setConfig(normalizeProviderConfig(loaded))).catch(console.error);
-    loadSettings().then(setSettings).catch(console.error);
+    loadSettings().then((s) => setSettings(normalizeAppSettings(s))).catch(console.error);
     loadTokenUsageStats().then(setUsageStats).catch(console.error);
   }, []);
 
@@ -128,7 +134,7 @@ export function SettingsWindow() {
     const normalized = normalizeProviderConfig(config);
     setConfig(normalized);
     await saveConfig(normalized);
-    await saveSettings(settings);
+    await saveSettings(normalizeAppSettings(settings));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -146,13 +152,13 @@ export function SettingsWindow() {
       </div>
 
       <div className={styles.tabs}>
-        {(["llm", "tts", "memory", "usage"] as const).map((t) => (
+        {(["llm", "tts", "memory", "interaction", "usage"] as const).map((t) => (
           <button
             key={t}
             className={`${styles.tab} ${tab === t ? styles.activeTab : ""}`}
             onClick={() => setTab(t)}
           >
-            {{ llm: "模型", tts: "语音", memory: "记忆", usage: "用量" }[t]}
+            {{ llm: "模型", tts: "语音", memory: "记忆", interaction: "互动", usage: "用量" }[t]}
           </button>
         ))}
       </div>
@@ -166,6 +172,9 @@ export function SettingsWindow() {
         )}
         {tab === "memory" && (
           <MemoryTab settings={settings} onChange={setSettings} />
+        )}
+        {tab === "interaction" && (
+          <InteractionTab settings={settings} onChange={setSettings} />
         )}
         {tab === "usage" && (
           <UsageTab stats={usageStats} onChange={setUsageStats} />
@@ -400,6 +409,40 @@ function MemoryTab({ settings, onChange }: { settings: AppSettings; onChange: (s
         <button className={styles.dangerBtn} onClick={handleClear}>
           清空记忆
         </button>
+      </section>
+    </div>
+  );
+}
+
+function InteractionTab({ settings, onChange }: { settings: AppSettings; onChange: (s: AppSettings) => void }) {
+  const levels: Array<{ label: string; value: AppSettings["interaction_level"]; description: string }> = [
+    { label: "关闭", value: "off", description: "不主动说话，只保留聊天窗口。" },
+    { label: "低", value: "low", description: "每日问候和点击、拖动反馈。" },
+    { label: "标准", value: "standard", description: "低强度基础上，偶尔空闲互动。" },
+    { label: "活跃", value: "active", description: "更频繁的空闲互动，适合喜欢桌宠存在感的人。" },
+  ];
+
+  return (
+    <div className={styles.form}>
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2>主动互动</h2>
+          <p>控制小黑主动打招呼、点击反馈和空闲短句的频率。</p>
+        </div>
+
+        <div className={styles.choiceList}>
+          {levels.map((level) => (
+            <button
+              key={level.value}
+              type="button"
+              className={`${styles.choiceButton} ${settings.interaction_level === level.value ? styles.activeChoice : ""}`}
+              onClick={() => onChange({ ...settings, interaction_level: level.value })}
+            >
+              <strong>{level.label}</strong>
+              <span>{level.description}</span>
+            </button>
+          ))}
+        </div>
       </section>
     </div>
   );

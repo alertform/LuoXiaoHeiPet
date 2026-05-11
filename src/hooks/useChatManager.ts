@@ -22,6 +22,8 @@ import {
 const MAX_HISTORY = 20;
 const MAX_TOOL_ROUNDS = 5;
 
+export type ChatNoticeReason = "missingConfig" | "networkError" | "serverError" | "emptyResponse" | "toolLimit";
+
 export interface ChatManager {
   history: ChatMessage[];
   streamingContent: string;
@@ -36,7 +38,10 @@ export interface ChatManager {
   clearHistory: () => void;
 }
 
-export function useChatManager(ttsEnabled: boolean): ChatManager {
+export function useChatManager(
+  ttsEnabled: boolean,
+  onNotice?: (reason: ChatNoticeReason, detail?: string) => void
+): ChatManager {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [streamingContent, setStreamingContent] = useState("");
   const [reasoningContent, setReasoningContent] = useState("");
@@ -71,13 +76,14 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
   const showError = useCallback(
     (err: unknown) => {
       const message = err instanceof Error ? err.message : String(err);
+      onNotice?.(classifyError(message), message);
       appendMessage(assistantMessage(`请求失败：${message}`));
       setStreamingContent("");
       setReasoningContent("");
       setToolStatus(null);
       processNextQueuedRef.current();
     },
-    [appendMessage]
+    [appendMessage, onNotice]
   );
 
   const completeCurrentTurn = useCallback(
@@ -159,6 +165,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
   const sendNonStreaming = useCallback(
     async (messages: ChatMessage[], toolRound: number) => {
       if (toolRound >= MAX_TOOL_ROUNDS) {
+        onNotice?.("toolLimit");
         appendMessage(assistantMessage("工具调用次数过多，已停止喵~"));
         await completeCurrentTurn(undefined, false);
         return;
@@ -175,6 +182,7 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
           appendMessage(assistMsg);
           await completeCurrentTurn(response.content);
         } else {
+          onNotice?.("emptyResponse");
           appendMessage(assistantMessage("模型返回了空内容，请检查模型是否支持当前参数或工具调用。"));
           await completeCurrentTurn(undefined, false);
         }
@@ -335,4 +343,10 @@ export function useChatManager(ttsEnabled: boolean): ChatManager {
     cancel,
     clearHistory,
   };
+}
+
+function classifyError(message: string): ChatNoticeReason {
+  if (message.includes("API Key") || message.includes("未配置")) return "missingConfig";
+  if (message.includes("网络错误") || message.includes("Failed to fetch")) return "networkError";
+  return "serverError";
 }

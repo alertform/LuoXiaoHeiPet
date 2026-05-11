@@ -53,7 +53,7 @@
 .tabs {
   margin: 14px 18px 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 3px;
   padding: 3px;
   background: #0d1a15;
@@ -209,6 +209,52 @@
   background: #163b26;
   border-color: #56d783;
   color: #eaffef;
+}
+
+.choiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.choiceButton {
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 12px;
+  border: 1px solid #244635;
+  border-radius: 8px;
+  background: #09130f;
+  color: #a9c6b2;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.choiceButton:hover {
+  border-color: #3d8e5a;
+  color: #e6f4eb;
+}
+
+.choiceButton strong,
+.choiceButton span {
+  display: block;
+}
+
+.choiceButton strong {
+  color: #e6f4eb;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.choiceButton span {
+  color: #8ca995;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.activeChoice {
+  background: #163b26;
+  border-color: #56d783;
 }
 
 .fieldGrid {
