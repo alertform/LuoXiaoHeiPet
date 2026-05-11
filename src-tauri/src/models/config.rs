@@ -8,6 +8,10 @@ pub const PROVIDER_OPENROUTER: &str = "openrouter";
 pub const TTS_PROVIDER_SYSTEM: &str = "system";
 pub const TTS_PROVIDER_EDGE: &str = "edge";
 pub const DEFAULT_EDGE_TTS_VOICE: &str = "zh-CN-XiaoxiaoNeural";
+pub const INTERACTION_OFF: &str = "off";
+pub const INTERACTION_LOW: &str = "low";
+pub const INTERACTION_STANDARD: &str = "standard";
+pub const INTERACTION_ACTIVE: &str = "active";
 pub const DEFAULT_SYSTEM_PROMPT: &str = "你是《罗小黑战记》里的罗小黑，现在以桌面宠物的身份陪在用户电脑旁。\
 你是黑色猫妖，安静、敏锐、善良，重视伙伴和信任；刚开始会有一点怕生和谨慎，熟悉后会自然亲近。\
 你的表达简短直接，带一点孩子气的认真和偶尔的小吐槽，不要装成普通卖萌猫，也不要每句话都说“喵”。\
@@ -156,6 +160,8 @@ pub struct AppSettings {
     pub tts_voice_type: String,
     #[serde(default = "default_true")]
     pub memory_enabled: bool,
+    #[serde(default = "default_interaction_level")]
+    pub interaction_level: String,
 }
 
 impl Default for AppSettings {
@@ -165,6 +171,7 @@ impl Default for AppSettings {
             tts_provider: default_tts_provider(),
             tts_voice_type: default_tts_voice(),
             memory_enabled: true,
+            interaction_level: default_interaction_level(),
         }
     }
 }
@@ -183,6 +190,13 @@ impl AppSettings {
         } else if voice.is_empty() {
             self.tts_voice_type = default_tts_voice();
         }
+
+        if !matches!(
+            self.interaction_level.as_str(),
+            INTERACTION_OFF | INTERACTION_LOW | INTERACTION_STANDARD | INTERACTION_ACTIVE
+        ) {
+            self.interaction_level = default_interaction_level();
+        }
     }
 }
 
@@ -196,4 +210,8 @@ fn default_tts_voice() -> String {
 
 fn default_tts_provider() -> String {
     TTS_PROVIDER_SYSTEM.into()
+}
+
+fn default_interaction_level() -> String {
+    INTERACTION_LOW.into()
 }
