@@ -56,32 +56,66 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'LuoXiaoHei Pet ${{ github.ref_name }}'
           releaseBody: |
-            ## LuoXiaoHei Desktop Pet ${{ github.ref_name }}
+            # LuoXiaoHei Pet ${{ github.ref_name }} (Prerelease)
 
-            Cross-platform desktop pet with streaming AI chat, queued input, model provider settings, token usage statistics, and TTS.
+            > 跨平台桌面宠物 - AI 对话 · Tool Calling · TTS · 多模型服务商 · 多状态动画
+            > Cross-platform desktop pet - AI chat · Tool calling · TTS · Multi-provider models · Rich animation states
 
-            ### Highlights
-            - Luo Xiaohei themed animated desktop pet assets and app icon
-            - Refined chat window and settings UI with green/black visual theme
-            - Multi-provider model configuration: OpenAI-compatible providers, DeepSeek, Qwen, MiniMax, Claude, Doubao, and OpenRouter
-            - Message queue support while Xiaohei is replying, with editable queued input
-            - Token usage statistics tab in Settings
-            - TTS configuration fixes, including startup voice loading from saved settings
-            - Interaction improvements: proactive behaviors, outside-click chat close, and safer window positioning
+            ⚠️ **Prerelease / 实验阶段** - 0.x 期间配置项与 API 可能 breaking。
 
-            ### Downloads
-            - **macOS**: `.dmg` (Universal — Intel + Apple Silicon)
-            - **Windows**: `.msi` / `.exe`
-            - **Linux**: `.deb` / `.AppImage` / `.rpm`
+            ## 🔄 What's New since the previous release
 
-            ### First Run
-            1. Launch the app.
-            2. Open Settings from the tray/menu bar.
-            3. Choose a model provider and enter the required API key, base URL, and model fields.
-            4. Optional: enable and configure TTS voice settings.
+            ### ✨ Improvements
+            - **罗小黑素材与图标更新** - 桌宠动画素材、idle 预览 GIF 和应用图标改为更贴近罗小黑风格
+            - **Settings 面板重做** - 绿黑主题视觉、内容结构和模型配置入口优化
+            - **多模型服务商配置** - 支持 OpenAI-compatible、DeepSeek、Qwen、MiniMax、Claude、Doubao 和 OpenRouter
+            - **消息队列输入** - 小黑回复期间仍可继续输入，队列内容可查看并编辑
+            - **Token 用量统计** - Settings 新增用量统计 Tab，记录不同模型调用消耗
+            - **交互体验增强** - 主动行为、卖萌提示、对话框外点击关闭、窗口位置保护
 
-            ### Notes
-            This is a prerelease. macOS and Windows binaries are unsigned, so the first launch may require manual approval from the operating system.
+            ### 🐛 Fixes
+            - **Windows prerelease 打包修复** - 版本号恢复为纯 `0.0.x`，避免 MSI 拒绝 `0.0.x-pre` 版本
+            - **TTS 启动音色修复** - 启动时正确加载设置中的 Edge TTS / 语音配置
+            - **聊天窗口动画闪烁修复** - 双击打开聊天时 idle 动画不再持续闪烁
+            - **DeepSeek 等服务错误提示优化** - 请求失败时返回更明确的错误状态
+
+            ## ✨ Highlights / 亮点
+
+            - **OpenRouter + 多服务商接入** - 可直接配置主流模型服务商，也可通过 OpenRouter 中转兼容模型
+            - **Animation system** - 10+ 状态（idle / walk / drag / fall / happy / lookAround / sleep / stretch / talking / thinking）
+            - **Reasoning UI** - 可折叠 reasoning / 思考内容展示
+            - **Tool calling architecture** - Agent 风格工具调用
+            - **Reproducible asset pipeline** - `tools/build_xiaohei_assets.py`
+
+            ## 📦 Downloads
+
+            | Platform | File |
+            |---|---|
+            | macOS (Universal - Apple Silicon + Intel) | `LuoXiaoHei.Pet_*_universal.dmg` |
+            | Windows x64 | `LuoXiaoHei.Pet_*_x64-setup.exe` · `.msi` |
+            | Linux x86_64 | `*.AppImage` · `.deb` · `.rpm` |
+
+            ## 🚀 First Run
+
+            1. 打开应用 / Launch the app
+            2. 托盘或菜单栏图标 → Settings / Tray or menu bar icon → Settings
+            3. 选择模型服务商并填写 API Key、Base URL、Model 等字段
+            4. 可选：开启 TTS，并选择语音音色
+
+            ## ⚠️ Known Limitations
+
+            - macOS / Windows 二进制 **未签名**（首启可能被系统拦截，需手动放行）
+            - 0.x 版本 API/config 不保证向后兼容
+            - 二创项目，**非官方授权**；个人学习用途
+
+            ## 📝 Notes
+
+            Fan project / 二次创作 - 罗小黑战记 IP 归 [HMCH 官方](https://xhei.cn/) 所有。
+            Not affiliated with or endorsed by HMCH.
+
+            ## 🔗 Full Changelog
+
+            https://github.com/alertform/LuoXiaoHeiPet/releases
           releaseDraft: false
           prerelease: ${{ startsWith(github.ref_name, 'v0.') }}
           args: ${{ matrix.args }}
