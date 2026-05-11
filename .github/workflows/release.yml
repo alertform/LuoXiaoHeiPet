@@ -58,14 +58,16 @@ jobs:
           releaseBody: |
             ## LuoXiaoHei Desktop Pet ${{ github.ref_name }}
 
-            Cross-platform desktop pet with streaming AI chat, tool calling, and TTS.
-            Multi-model routing via **OpenRouter** (any compatible model) with optional Volcano Engine TTS.
+            Cross-platform desktop pet with streaming AI chat, queued input, model provider settings, token usage statistics, and TTS.
 
             ### Highlights
-            - 10+ animated states (idle / walk / drag / fall / happy / sleep / talking / thinking …)
-            - Reasoning UI for chain-of-thought streaming
-            - Tool calling architecture
-            - Configurable model + endpoint via Settings panel
+            - Luo Xiaohei themed animated desktop pet assets and app icon
+            - Refined chat window and settings UI with green/black visual theme
+            - Multi-provider model configuration: OpenAI-compatible providers, DeepSeek, Qwen, MiniMax, Claude, Doubao, and OpenRouter
+            - Message queue support while Xiaohei is replying, with editable queued input
+            - Token usage statistics tab in Settings
+            - TTS configuration fixes, including startup voice loading from saved settings
+            - Interaction improvements: proactive behaviors, outside-click chat close, and safer window positioning
 
             ### Downloads
             - **macOS**: `.dmg` (Universal — Intel + Apple Silicon)
@@ -73,9 +75,13 @@ jobs:
             - **Linux**: `.deb` / `.AppImage` / `.rpm`
 
             ### First Run
-            1. Launch the app
-            2. Tray icon → Settings
-            3. Enter `OPENROUTER_API_KEY` (or set as environment variable before launch)
+            1. Launch the app.
+            2. Open Settings from the tray/menu bar.
+            3. Choose a model provider and enter the required API key, base URL, and model fields.
+            4. Optional: enable and configure TTS voice settings.
+
+            ### Notes
+            This is a prerelease. macOS and Windows binaries are unsigned, so the first launch may require manual approval from the operating system.
           releaseDraft: false
           prerelease: ${{ startsWith(github.ref_name, 'v0.') }}
           args: ${{ matrix.args }}
